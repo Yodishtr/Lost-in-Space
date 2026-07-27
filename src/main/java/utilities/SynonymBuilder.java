@@ -1,5 +1,7 @@
 package utilities;
 
+import Model.Command;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,7 +11,7 @@ import java.util.*;
 
 public class SynonymBuilder {
 
-    public static Map<String, Set<String>> buildSynonyms(String synonymsText) {
+    public static Map<String, Command.CommandType> buildSynonyms(String synonymsText) {
         try (InputStream inputStream = SynonymBuilder.class.getResourceAsStream("/" + synonymsText))
         {
             if (inputStream == null) {
@@ -17,7 +19,7 @@ public class SynonymBuilder {
             }
             try (BufferedReader buffReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                 String currentLine;
-                Map<String, Set<String>> synonyms = new HashMap<>();
+                Map<String, Command.CommandType> synonyms = new HashMap<>();
                 while ((currentLine = buffReader.readLine()) != null) {
                     String trimmedLine = currentLine.trim();
                     if (!trimmedLine.startsWith("#") && !trimmedLine.isBlank()) {
@@ -26,11 +28,11 @@ public class SynonymBuilder {
                             throw new IllegalArgumentException("synonyms.txt.txt contains invalid synonym lines: " +
                                     currentLine);
                         }
-                        String currentKey = firstSplit[0].trim();
-                        synonyms.put(currentKey, new HashSet<>());
+                        String currentVerb = firstSplit[0].trim();
+                        Command.CommandType commandType = Command.CommandType.getCommandFromString(currentVerb);
                         String[] secondSplit = firstSplit[1].trim().split(",");
                         for (String word : secondSplit) {
-                            synonyms.get(currentKey).add(word.trim());
+                            synonyms.put(word.trim(), commandType);
                         }
                     }
                 }

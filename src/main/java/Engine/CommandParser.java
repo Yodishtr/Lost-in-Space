@@ -1,12 +1,13 @@
 package Engine;
 
+import Model.Command;
 import utilities.SynonymBuilder;
 
 import java.util.*;
 
 public class CommandParser {
 
-    private final Map<String, Set<String>> synonymDictionary;
+    private final Map<String, Command.CommandType> synonymDictionary;
     private final Set<String> stopWordSet;
 
     public CommandParser() {
@@ -19,14 +20,32 @@ public class CommandParser {
     // removal of stop words, resolve the verb by using the synonym map,
     // extract the target, assemble the command object.
 
+    public Command parseCommand(String input) {
+        if (input.isEmpty()) {
+            return new Command(Command.CommandType.UNKNOWN, null);
+        }
+        String normalizedInput = normalization(input);
+        List<String> tokenizedInput = tokenization(normalizedInput);
+        List<String> stopWordFree = stopWordRemoval(tokenizedInput);
+        if (stopWordFree.isEmpty()) {
+            return new Command(Command.CommandType.UNKNOWN, null);
+        }
+        Command.CommandType verb = getCommandType(stopWordFree);
+        String target = targetExtraction(stopWordFree);
+        return new Command(verb, target);
+    }
+
     private String normalization(String rawInput) {
         String normalizedInput = rawInput.replaceAll("\\p{Punct}", " ");
         return normalizedInput.trim().toLowerCase();
     }
 
     private List<String> tokenization(String sanitizedInput) {
-        String[] wordArray = sanitizedInput.split(" ");
-        return new ArrayList<>(Arrays.asList(wordArray));
+        if (sanitizedInput.isEmpty()) {
+            return new ArrayList<>();
+        } else {
+            return new ArrayList<>(Arrays.asList(sanitizedInput.split("\\s+")));
+        }
     }
 
     private List<String> stopWordRemoval(List<String> wordList) {
@@ -39,6 +58,19 @@ public class CommandParser {
         return stopWordFree;
     }
 
+    private Command.CommandType getCommandType(List<String> wordList) {
+        if (wordList.isEmpty()){
+            return Command.CommandType.UNKNOWN;
+        }
+        return synonymDictionary.get(wordList.getFirst());
+    }
 
+    private String targetExtraction(List<String> wordList) {
+        if (wordList.size() <= 1) {
+            return null;
+        } else {
+            return String.join(" ", wordList.subList(1, wordList.size()));
+        }
+    }
 
 }
