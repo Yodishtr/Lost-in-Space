@@ -1,29 +1,31 @@
 package dto;
 
+import java.util.List;
+
 public class CommandResult {
 
-    private String displayMessage;
-    private boolean imageChanged;
+    private List<String> displayMessage;
+    private boolean changeImage;
     private boolean gameOver;
     private String displayAssetPath;
     private String displayAssetType;
 
-    public CommandResult(String displayMessage, boolean imageChanged, boolean gameOver, String displayAssetPath,
+    public CommandResult(List<String> displayMessage, boolean changeImage, boolean gameOver, String displayAssetPath,
                          String displayAssetType) {
         this.displayMessage = displayMessage;
-        this.imageChanged = imageChanged;
+        this.changeImage = changeImage;
         this.gameOver = gameOver;
         this.displayAssetPath = displayAssetPath;
         this.displayAssetType = displayAssetType;
     }
 
     // Getters
-    public String getDisplayMessage() {
+    public List<String> getDisplayMessage() {
         return displayMessage;
     }
 
-    public boolean isImageChanged() {
-        return imageChanged;
+    public boolean isChangeImage() {
+        return changeImage;
     }
 
     public boolean isGameOver() {
@@ -39,12 +41,12 @@ public class CommandResult {
     }
 
     // Setters
-    public void setDisplayMessage(String displayMessage) {
+    public void setDisplayMessage(List<String> displayMessage) {
         this.displayMessage = displayMessage;
     }
 
-    public void setImageChanged(boolean imageChanged) {
-        this.imageChanged = imageChanged;
+    public void setChangeImage(boolean changeImage) {
+        this.changeImage = changeImage;
     }
 
     public void setGameOver(boolean gameOver) {

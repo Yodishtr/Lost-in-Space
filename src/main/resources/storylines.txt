@@ -1,0 +1,20 @@
+# ==============================================================================
+# GAME NARRATIVE & ROOM DESCRIPTIONS
+# Format: KEY: Description / Story text
+# ==============================================================================
+
+# Intro Narrative Sequence (Always use INTRO_<T> when adding intro lines)
+INTRO_1: Emergency klaxons blare through the cold steel hull, painting the Airlock in pulsing crimson light. Atmospheric pressure is dropping rapidly.
+INTRO_2: The automated defense systems have gone haywire, and corrupted crewmates roam the outer bays. Your escape vessel is prepped, but crucial supplies are missing.
+INTRO_3: You must venture into the station's four bays, secure the essential survival components, deal with high-threat hazards, and return to the Airlock to escape.
+
+# Room Descriptions (Hub & Spokes Layout)
+AIRLOCK: The central access hub and your only way off this ship. Heavy blast doors lead out to the Cargo Bay, Engineering, Medical Bay, and the Armory.
+
+CARGO_BAY: Tall storage racks loom in the flickering shadows. Oversized crates lie scattered across the deck floor, holding spare survival equipment and tools.
+
+ENGINEERING: Steam wallows across the metal floor with a loud hiss. Massive power conduits hum rhythmically, and maintenance kits sit open on the workbenches.
+
+MEDICAL_BAY: Sterile white light illuminates discarded medical supplies. An unnatural shadow moves near the back pods—an infected crewmate blocks access to the bay.
+
+ARMORY: Reinforced weapons racks line the walls behind heavy security glass. An automated defense drone hovers in the center, scanning for unauthorized personnel.
