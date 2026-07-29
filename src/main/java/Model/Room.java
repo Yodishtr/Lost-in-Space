@@ -7,7 +7,7 @@ public class Room {
     private String name;
     private String description;
     private final Map<String, Room> exits;
-    private List<Item> itemList;
+    private final List<Item> itemList;
     private Optional<Enemy> optionalEnemy;
 
     public Room(String name, String description, Map<String, Room> exits, List<Item> itemList, Optional<Enemy> enemy) {
@@ -21,6 +21,13 @@ public class Room {
     public Room(String name, String description) {
         this.name = name;
         this.description = description;
+        this.exits = new HashMap<>();
+        this.itemList = new ArrayList<>();
+        this.optionalEnemy = Optional.empty();
+    }
+
+    public Room (String name) {
+        this.name = name;
         this.exits = new HashMap<>();
         this.itemList = new ArrayList<>();
         this.optionalEnemy = Optional.empty();
