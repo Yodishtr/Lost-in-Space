@@ -46,6 +46,7 @@ public class GameEngine {
             CommandType verbCommand = command.getVerb();
             switch (verbCommand) {
                 case CommandType.GO:
+
                     break;
                 case CommandType.TAKE:
                     break;

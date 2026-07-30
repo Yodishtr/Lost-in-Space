@@ -6,6 +6,7 @@ public class Room {
 
     private String name;
     private String description;
+    // exits map is direction (String) -> next room (Room)
     private final Map<String, Room> exits;
     private final List<Item> itemList;
     private Optional<Enemy> optionalEnemy;
@@ -70,6 +71,10 @@ public class Room {
 
     public void removeExit(String exitName) {
         this.exits.remove(exitName);
+    }
+
+    public void addExit(String direction, Room destRoom) {
+        this.exits.put(direction, destRoom);
     }
 
     public void setItemList(List<Item> newItemList) {
