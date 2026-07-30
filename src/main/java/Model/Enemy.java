@@ -4,6 +4,7 @@ public class Enemy {
 
     private String name;
     private String requiredItemName;
+    // true if enemy defeated and false if enemy is not defeated
     private boolean resolved;
     private String failureMessage;
     private String successMessage;
