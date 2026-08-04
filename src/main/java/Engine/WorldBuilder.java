@@ -11,10 +11,19 @@ import java.util.List;
 import java.util.Map;
 
 public class WorldBuilder {
+    public static final String CARGO_BAY = "Cargo Bay";
+    public static final String ENGINEERING = "Engineering";
+    public static final String ARMORY = "Armory";
+    public static final String AIRLOCK = "Airlock";
+    public static final String MEDICAL_BAY = "Medical Bay";
+    public static final String NORTH = "North";
+    public static final String EAST = "East";
+    public static final String SOUTH = "South";
+    public static final String WEST = "West";
     // use the storiesbuilder utility class to fill out the description of each room
 
     public static Map<String, Room> buildWorld() {
-        String[] roomNames = {"Airlock", "Armory", "Cargo Bay", "Engineering", "Medical Bay"};
+        String[] roomNames = {AIRLOCK, ARMORY, CARGO_BAY, ENGINEERING, MEDICAL_BAY};
         String[] storylineNames = {"AIRLOCK", "ARMORY", "CARGO_BAY", "ENGINEERING", "MEDICAL_BAY"};
         Map<String, Room> rooms = new HashMap<>();
         int i = 0;
@@ -29,31 +38,31 @@ public class WorldBuilder {
         // for each room need to add their respective items and their enemy
         for (String roomName : rooms.keySet()) {
             Room currentRoom = rooms.get(roomName);
-            String[] directions = {"North","East", "South", "West" };
+            String[] directions = {NORTH, EAST, SOUTH, WEST};
             switch (roomName) {
-                case "Airlock":
+                case AIRLOCK:
                     for (String direction : directions) {
-                        if (direction.equals("North")) {
-                            currentRoom.addExit(direction, rooms.get("Cargo Bay"));
-                        } else if (direction.equals("East")) {
-                            currentRoom.addExit(direction, rooms.get("Medical Bay"));
-                        } else if (direction.equals("South")) {
-                            currentRoom.addExit(direction, rooms.get("Armory"));
-                        } else if (direction.equals("West")) {
-                            currentRoom.addExit(direction, rooms.get("Engineering"));
+                        if (direction.equals(NORTH)) {
+                            currentRoom.addExit(direction, rooms.get(CARGO_BAY));
+                        } else if (direction.equals(EAST)) {
+                            currentRoom.addExit(direction, rooms.get(MEDICAL_BAY));
+                        } else if (direction.equals(SOUTH)) {
+                            currentRoom.addExit(direction, rooms.get(ARMORY));
+                        } else if (direction.equals(WEST)) {
+                            currentRoom.addExit(direction, rooms.get(ENGINEERING));
                         }
                     }
                     break;
-                case "Armory":
+                case ARMORY:
                     for (String direction : directions) {
-                        if (direction.equals("North")) {
-                            currentRoom.addExit(direction, rooms.get("Airlock"));
-                        } else if (direction.equals("East")) {
-                            currentRoom.addExit(direction, rooms.get("Medical Bay"));
-                        } else if (direction.equals("South")) {
+                        if (direction.equals(NORTH)) {
+                            currentRoom.addExit(direction, rooms.get(AIRLOCK));
+                        } else if (direction.equals(EAST)) {
+                            currentRoom.addExit(direction, rooms.get(MEDICAL_BAY));
+                        } else if (direction.equals(SOUTH)) {
                             currentRoom.addExit(direction, null);
-                        } else if (direction.equals("West")) {
-                            currentRoom.addExit(direction, rooms.get("Engineering"));
+                        } else if (direction.equals(WEST)) {
+                            currentRoom.addExit(direction, rooms.get(ENGINEERING));
                         }
                     }
                     Enemy securityDrone = new Enemy("Security Drone", "Multitool", false,
@@ -62,16 +71,16 @@ public class WorldBuilder {
                                     "disabling it completely.");
                     currentRoom.setOptionalEnemy(securityDrone);
                     break;
-                case "Cargo Bay":
+                case CARGO_BAY:
                     for (String direction : directions) {
-                        if (direction.equals("North")) {
+                        if (direction.equals(NORTH)) {
                             currentRoom.addExit(direction, null);
-                        } else if (direction.equals("East")) {
-                            currentRoom.addExit(direction, rooms.get("Medical Bay"));
-                        } else if (direction.equals("South")) {
-                            currentRoom.addExit(direction, rooms.get("Airlock"));
-                        } else if (direction.equals("West")) {
-                            currentRoom.addExit(direction, rooms.get("Engineering"));
+                        } else if (direction.equals(EAST)) {
+                            currentRoom.addExit(direction, rooms.get(MEDICAL_BAY));
+                        } else if (direction.equals(SOUTH)) {
+                            currentRoom.addExit(direction, rooms.get(AIRLOCK));
+                        } else if (direction.equals(WEST)) {
+                            currentRoom.addExit(direction, rooms.get(ENGINEERING));
                         }
                     }
                     Item spareOxygenTank = new Item("Spare Oxygen Tank", "A portable reserve of " +
@@ -85,15 +94,15 @@ public class WorldBuilder {
                     currentRoom.addItem(spareOxygenTank);
                     currentRoom.addItem(multiTool);
                     break;
-                case "Engineering":
+                case ENGINEERING:
                     for (String direction : directions) {
-                        if (direction.equals("North")) {
-                            currentRoom.addExit(direction, rooms.get("Cargo Bay"));
-                        } else if (direction.equals("East")) {
-                            currentRoom.addExit(direction, rooms.get("Airlock"));
-                        } else if (direction.equals("South")) {
-                            currentRoom.addExit(direction, rooms.get("Armory"));
-                        } else if (direction.equals("West")) {
+                        if (direction.equals(NORTH)) {
+                            currentRoom.addExit(direction, rooms.get(CARGO_BAY));
+                        } else if (direction.equals(EAST)) {
+                            currentRoom.addExit(direction, rooms.get(AIRLOCK));
+                        } else if (direction.equals(SOUTH)) {
+                            currentRoom.addExit(direction, rooms.get(ARMORY));
+                        } else if (direction.equals(WEST)) {
                             currentRoom.addExit(direction, null);
                         }
                     }
@@ -107,16 +116,16 @@ public class WorldBuilder {
                     currentRoom.addItem(sedativeInjector);
                     currentRoom.addItem(fuelCell);
                     break;
-                case "Medical Bay":
+                case MEDICAL_BAY:
                     for (String direction : directions) {
-                        if (direction.equals("North")) {
-                            currentRoom.addExit(direction, rooms.get("Cargo Bay"));
-                        } else if (direction.equals("East")) {
+                        if (direction.equals(NORTH)) {
+                            currentRoom.addExit(direction, rooms.get(CARGO_BAY));
+                        } else if (direction.equals(EAST)) {
                             currentRoom.addExit(direction, null);
-                        } else if (direction.equals("South")) {
-                            currentRoom.addExit(direction, rooms.get("Armory"));
-                        } else if (direction.equals("West")) {
-                            currentRoom.addExit(direction, rooms.get("Airlock"));
+                        } else if (direction.equals(SOUTH)) {
+                            currentRoom.addExit(direction, rooms.get(ARMORY));
+                        } else if (direction.equals(WEST)) {
+                            currentRoom.addExit(direction, rooms.get(AIRLOCK));
                         }
                     }
                     Enemy infectedCrewMate = new Enemy("Infected Crewmate", "Sedative Injector",

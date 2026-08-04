@@ -9,11 +9,13 @@ public class Player {
     private final Map<String, Item> inventory = new HashMap<>();
     private Integer health;
     private String name;
+    private Integer enemiesDefeated;
 
     public Player(Room currentRoom, Integer health, String name) {
         this.currentRoom = currentRoom;
         this.health = health;
         this.name = name;
+        this.enemiesDefeated = 0;
     }
 
     // Getters
@@ -33,9 +35,17 @@ public class Player {
         return name;
     }
 
+    public Integer getEnemiesDefeated() {
+        return enemiesDefeated;
+    }
+
     // Setters
     public void setHealth(Integer health) {
-        this.health = health;
+        if (health < 0) {
+            this.health = 0;
+        } else {
+            this.health = health;
+        }
     }
 
     public void setName(String name) {
@@ -53,5 +63,13 @@ public class Player {
 
     public void addItemToInventory(Item item) {
         this.inventory.put(item.getName(), item);
+    }
+
+    public void removeItemFromInventory(Item item) {
+        this.inventory.remove(item.getName());
+    }
+
+    public void addEnemyDefeated() {
+        this.enemiesDefeated++;
     }
 }
