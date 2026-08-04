@@ -198,8 +198,8 @@ public class GameEngine {
                 return new CommandResult(Arrays.asList(commandMessage), false, false,
                         roomImageAssetName, "Image");
             } else if (count < 2 && playerCurrentRoom.getName().equals("Airlock")) {
-                String notEnoughItemMessage = player.getName() + " needs to collect the necessary items and head to the" +
-                        "Airlock";
+                String notEnoughItemMessage = player.getName() + " needs to collect the necessary items then " +
+                        "head to the Airlock";
                 String[] commandMessage = notEnoughItemMessage.split("\\p{Punct}");
                 return new CommandResult(Arrays.asList(commandMessage), false, false,
                         roomImageAssetName, "Image");
