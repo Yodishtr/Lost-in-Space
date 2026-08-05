@@ -6,6 +6,7 @@ import dto.CommandResult;
 import utilities.StoriesBuilder;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GameEngine {
 
@@ -44,9 +45,11 @@ public class GameEngine {
                     break;
                 case CommandType.LOOK:
                     // private helper function for the look verb
+                    return handleLook(command);
                     break;
                 case CommandType.USE:
                     // private helper function for the use verb
+                    return handleUse(command);
                     break;
                 case CommandType.INVENTORY:
                     // private helper function for the inventory verb
@@ -61,13 +64,15 @@ public class GameEngine {
         }
     }
 
-    public CommandResult gameOutcome() {
-        if (gameState == GameState.WON){
+    public CommandResult gameOutcome(GameState currentGameState) {
+        if (currentGameState == GameState.WON){
+            gameState = GameState.WON;
             String winnerMessage = "Congratulations, you won! Now you can finally go back home.";
             String[] splitWinMessage = winnerMessage.split("\\p{Punct}");
             return new CommandResult(Arrays.asList(splitWinMessage), true, true,
                     "/images/won.png", "image");
-        } else if (gameState == GameState.LOST){
+        } else if (currentGameState == GameState.LOST){
+            gameState = GameState.LOST;
             String lostMessage = "You Died! Your remaining crew was waiting in the escape pod. " +
                     "They will perish.";
             String[] splitLostMessage = lostMessage.split("\\p{Punct}");
@@ -117,8 +122,7 @@ public class GameEngine {
                     "\\p{Punct}");
             player.setHealth(player.getHealth()-50);
             if (player.getHealth() <= 0) {
-                gameState = GameState.LOST;
-                return gameOutcome();
+                return gameOutcome(GameState.LOST);
             }
             return new CommandResult(Arrays.asList(failureMessageSplit), false, false,
                     roomImageAssetName, "Image");
@@ -158,7 +162,7 @@ public class GameEngine {
         Iterator<Item> itemIterator = playerCurrentRoom.getItemList().iterator();
         while (itemIterator.hasNext()) {
             Item item = itemIterator.next();
-            if (item.getName().equals(object)) {
+            if (object.contains(item.getName())) {
                 player.addItemToInventory(item);
                 itemIterator.remove();
                 String foundItemMessage = player.getName() + " took " + item.getName();
@@ -203,9 +207,80 @@ public class GameEngine {
                 String[] commandMessage = notEnoughItemMessage.split("\\p{Punct}");
                 return new CommandResult(Arrays.asList(commandMessage), false, false,
                         roomImageAssetName, "Image");
+            } else if (count == 2 && !playerCurrentRoom.getName().equals("Airlock")) {
+                String notInTheRightRoom = player.getName() + " is not in the right room. The escape pod can only be " +
+                        "accessed by the Airlock.";
+                String[] commandMessage = notInTheRightRoom.split("\\p{Punct}");
+                return new CommandResult(Arrays.asList(commandMessage), false, false,
+                        roomImageAssetName, "Image");
+            } else {
+                return gameOutcome(GameState.WON);
             }
         }
+
+        if (playerCurrentRoom.getOptionalEnemy().isPresent()) {
+            Enemy enemyInTheRoom = playerCurrentRoom.getOptionalEnemy().get();
+            String fatalItem = enemyInTheRoom.getRequiredItemName();
+            if (object.contains(fatalItem)) {
+                enemyInTheRoom.setResolved(true);
+                String[] successMessage = enemyInTheRoom.getSuccessMessage().split("\\p{Punct}");
+                return new CommandResult(Arrays.asList(successMessage), false, false,
+                        roomImageAssetName, "Image");
+            } else {
+                String[] failureMessage = enemyInTheRoom.getFailureMessage().split("\\p{Punct}");
+                player.setHealth(player.getHealth() - 50);
+                if (player.getHealth() <= 0) {
+                    return gameOutcome(GameState.LOST);
+                }
+                return new CommandResult(Arrays.asList(failureMessage), false, false,
+                        roomImageAssetName, "Image");
+            }
+        }
+
+        String randomUseMessage = player.getName() + " used " + object;
+        String[] commandMessage = randomUseMessage.split("\\p{Punct}");
+        return new CommandResult(Arrays.asList(commandMessage), false, false,
+                roomImageAssetName, "Image");
+
     }
 
+    private CommandResult handleLook(Command command) {
+        Room playerCurrentRoom = player.getCurrentRoom();
+        String roomImageAssetName = getRoomImageAssetName(playerCurrentRoom.getName());
+        String lookMessage = buildLookAroundMessage(playerCurrentRoom);
+        String[] commandMessage = lookMessage.split("\\p{Punct}");
+        return new CommandResult(Arrays.asList(commandMessage), false, false,
+                roomImageAssetName, "Image");
+    }
 
+    private String buildLookAroundMessage(Room currentRoom) {
+        StringBuilder lookAroundMessage = new StringBuilder();
+        lookAroundMessage.append(currentRoom.getDescription()).append(" ");
+        List<Item> items = currentRoom.getItemList();
+        lookAroundMessage.append(currentRoom.getName())
+                .append(" currently has  ")
+                .append(items.size())
+                .append(" items.");
+
+        if (!items.isEmpty()) {
+            lookAroundMessage.append("Items are ");
+            String itemNames = items.stream().map(Item::getName).collect(Collectors.joining(", "));
+            lookAroundMessage.append(itemNames).append(".");
+        }
+        return lookAroundMessage.toString();
+    }
+
+    private CommandResult handleInventory(Command command) {
+        Room playerCurrentRoom = player.getCurrentRoom();
+        String roomAssetImageName = getRoomImageAssetName(playerCurrentRoom.getName());
+        String inventoryDescriptionMessage = inventoryMessage(player.getInventory());
+    }
+
+    private String inventoryMessage(Map<String, Item> inventoryMap) {
+        StringBuilder inventoryMessage = new StringBuilder();
+        inventoryMessage.append(player.getName() + " has ").append(inventoryMap.size()).append(" items.");
+        if (!inventoryMap.isEmpty()) {
+            // use entrySet to stream the map and get both the item name and their description in a single string
+        }
+    }
 }
