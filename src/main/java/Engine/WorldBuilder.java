@@ -65,7 +65,7 @@ public class WorldBuilder {
                             currentRoom.addExit(direction, rooms.get(ENGINEERING));
                         }
                     }
-                    Enemy securityDrone = new Enemy("Security Drone", "Multitool", false,
+                    Enemy securityDrone = new Enemy("Security Drone", "Multitool",
                             "The drone identifies you as an intruder and eliminates you",
                             "The Multitool bypasses the drone’s security system, " +
                                     "disabling it completely.");
@@ -129,7 +129,7 @@ public class WorldBuilder {
                         }
                     }
                     Enemy infectedCrewMate = new Enemy("Infected Crewmate", "Sedative Injector",
-                            false, "The crewmate lunges at you, infecting you as well.",
+                            "The crewmate lunges at you, infecting you as well.",
                             "The sedative takes effect, and the infected crewmate collapses " +
                                     "unconscious");
                     currentRoom.setOptionalEnemy(infectedCrewMate);

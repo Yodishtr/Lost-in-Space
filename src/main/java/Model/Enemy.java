@@ -9,18 +9,18 @@ public class Enemy {
     private String failureMessage;
     private String successMessage;
 
-    public Enemy(String name, String requiredItemName, boolean resolved, String failureMessage, String successMessage) {
+    public Enemy(String name, String requiredItemName, String failureMessage, String successMessage) {
         this.name = name;
         this.requiredItemName = requiredItemName;
-        this.resolved = resolved;
+        this.resolved = false;
         this.failureMessage = failureMessage;
         this.successMessage = successMessage;
     }
 
-    public Enemy(String name, String requiredItemName, boolean resolved) {
+    public Enemy(String name, String requiredItemName) {
         this.name = name;
         this.requiredItemName = requiredItemName;
-        this.resolved = resolved;
+        this.resolved = false;
     }
 
     // Getters
