@@ -8,11 +8,15 @@ import java.util.*;
 public class CommandParser {
 
     private final Map<String, Command.CommandType> synonymDictionary;
-    private final Set<String> stopWordSet;
+    private Set<String> stopWordSet;
 
     public CommandParser() {
         synonymDictionary = SynonymBuilder.buildSynonyms("synonyms.txt");
         stopWordSet = SynonymBuilder.stopWordsBuilder("stopwords.txt");
+    }
+
+    public void setStopWordSet(Set<String> stopWordSetArg) {
+        stopWordSet = stopWordSetArg;
     }
 
     // need private helpers
@@ -31,6 +35,9 @@ public class CommandParser {
             return new Command(Command.CommandType.UNKNOWN, null);
         }
         Command.CommandType verb = getCommandType(stopWordFree);
+        if (verb == Command.CommandType.UNKNOWN) {
+            return new Command(Command.CommandType.UNKNOWN, null);
+        }
         String target = targetExtraction(stopWordFree);
         return new Command(verb, target);
     }
@@ -60,6 +67,9 @@ public class CommandParser {
 
     private Command.CommandType getCommandType(List<String> wordList) {
         if (wordList.isEmpty()){
+            return Command.CommandType.UNKNOWN;
+        }
+        if (!synonymDictionary.containsKey(wordList.getFirst())){
             return Command.CommandType.UNKNOWN;
         }
         return synonymDictionary.get(wordList.getFirst());
