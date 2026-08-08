@@ -22,6 +22,13 @@ public class GameEngine {
         this.player = new Player(roomsMap.get("Airlock"), 100, playerName);
     }
 
+    public GameEngine(GameState gameState, Player player) {
+        this.commandParser = new CommandParser();
+        this.gameState = gameState;
+        this.roomsMap = WorldBuilder.buildWorld();
+        this.player = player;
+    }
+
     public CommandResult processCommand(String commandInput) {
         Command command = commandParser.parseCommand(commandInput);
         if (gameState == GameState.INTRO) {
@@ -31,6 +38,7 @@ public class GameEngine {
                 String[] splitLine = line.split(".");
                 Collections.addAll(introLines, splitLine);
             }
+            gameState = GameState.PLAYING;
             return new CommandResult(introLines, true, false,
                     "/images/airlock.png", "image");
         } else if (gameState == GameState.PLAYING) {
@@ -93,7 +101,7 @@ public class GameEngine {
         return roomImageAssetName;
     }
 
-    private CommandResult handleGo(Command command) {
+    public CommandResult handleGo(Command command) {
         Room playerCurrentRoom = player.getCurrentRoom();
         Optional<String> optionalTarget = command.getTarget();
         String currentRoomName = playerCurrentRoom.getName();
@@ -108,7 +116,9 @@ public class GameEngine {
         }
         String direction = optionalTarget.get();
         Room targetRoom = playerCurrentRoom.getExits().get(direction);
-        boolean enemyDefeated = playerCurrentRoom.getOptionalEnemy().get().isResolved();
+        boolean enemyDefeated = playerCurrentRoom.getOptionalEnemy().
+                map(enemy -> !enemy.isResolved())
+                .orElse(false);
         if (targetRoom == null && !enemyDefeated) {
             String[] failureMessageSplit = playerCurrentRoom.getOptionalEnemy().get().getFailureMessage().split(
                     "\\p{Punct}");
@@ -127,6 +137,7 @@ public class GameEngine {
             String targetRoomImageAssetName = getRoomImageAssetName(targetRoomName);
             String movingIntoNextRoomMessage = "You head to the " + targetRoomName;
             String[] commandMessage = movingIntoNextRoomMessage.split("\\n");
+            player.setCurrentRoom(targetRoom);
             return new CommandResult(Arrays.asList(commandMessage), true, false,
                     targetRoomImageAssetName, "Image");
         } else {
@@ -139,7 +150,7 @@ public class GameEngine {
         }
     }
 
-    private CommandResult handleTake(Command command) {
+    public CommandResult handleTake(Command command) {
         Room playerCurrentRoom = player.getCurrentRoom();
         Optional<String> optionalTarget = command.getTarget();
         String roomImageAssetName = getRoomImageAssetName(playerCurrentRoom.getName());
@@ -236,7 +247,7 @@ public class GameEngine {
 
     }
 
-    private CommandResult handleLook(Command command) {
+    public CommandResult handleLook(Command command) {
         Room playerCurrentRoom = player.getCurrentRoom();
         String roomImageAssetName = getRoomImageAssetName(playerCurrentRoom.getName());
         String lookMessage = buildLookAroundMessage(playerCurrentRoom);
@@ -262,7 +273,7 @@ public class GameEngine {
         return lookAroundMessage.toString();
     }
 
-    private CommandResult handleInventory(Command command) {
+    public CommandResult handleInventory(Command command) {
         Room playerCurrentRoom = player.getCurrentRoom();
         String roomAssetImageName = getRoomImageAssetName(playerCurrentRoom.getName());
         String inventoryDescriptionMessage = inventoryMessage(player.getInventory());
@@ -289,7 +300,7 @@ public class GameEngine {
         return inventoryMessage.toString();
     }
 
-    private CommandResult handleSave() {
+    public CommandResult handleSave() {
         System.out.println("TO Implement: player" + player.getName() + "wants game progress to be saved");
         String saved = "Game not saved because save manager not implemented yet";
         String[] commandMessage = saved.split("\\p{Punct}");
@@ -299,7 +310,7 @@ public class GameEngine {
                 roomImageAssetName, "Image");
     }
 
-    private CommandResult handleUnknown() {
+    public CommandResult handleUnknown() {
         Room playerCurrentRoom = player.getCurrentRoom();
         String roomImageAssetName = getRoomImageAssetName(playerCurrentRoom.getName());
         String unknownCommand = "I don't understand that command.\n" +
@@ -307,5 +318,27 @@ public class GameEngine {
         String[] commandMessage = unknownCommand.split("\\n");
         return new CommandResult(Arrays.asList(commandMessage), false, false,
                 roomImageAssetName, "Image");
+    }
+
+
+    // getters (mostly to test for constructor)
+    public CommandParser getCommandParser() {
+        return commandParser;
+    }
+
+    public boolean hasCommandParser() {
+        return commandParser != null;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public Map<String, Room> getRoomMap() {
+        return roomsMap;
+    }
+
+    public GameState getGameState() {
+        return gameState;
     }
 }
