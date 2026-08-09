@@ -70,14 +70,14 @@ public class GameEngine {
             String winnerMessage = "Congratulations, you won!\nNow you can finally go back home.";
             String[] splitWinMessage = winnerMessage.split("\\n");
             return new CommandResult(Arrays.asList(splitWinMessage), true, true,
-                    "/images/won.png", "image");
+                    "/images/won.png", "Image");
         } else if (currentGameState == GameState.LOST){
             gameState = GameState.LOST;
             String lostMessage = "You Died!\nYour remaining crew was waiting in the escape pod.\n" +
                     "They will perish.";
             String[] splitLostMessage = lostMessage.split("\\n");
             return new CommandResult(Arrays.asList(splitLostMessage), true, true,
-                    "/images/lost.png", "image");
+                    "/images/lost.png", "Image");
         } else {
             String wronglyCalled = "This is a clear wrong use of this method.\nBecause the game state is " +
                     gameState.toString();
@@ -117,7 +117,7 @@ public class GameEngine {
         String direction = optionalTarget.get();
         Room targetRoom = playerCurrentRoom.getExits().get(direction);
         boolean enemyDefeated = playerCurrentRoom.getOptionalEnemy().
-                map(enemy -> !enemy.isResolved())
+                map(enemy -> enemy.isResolved())
                 .orElse(false);
         if (targetRoom == null && !enemyDefeated) {
             String[] failureMessageSplit = playerCurrentRoom.getOptionalEnemy().get().getFailureMessage().split(
@@ -143,9 +143,10 @@ public class GameEngine {
         } else {
             String targetRoomName = targetRoom.getName();
             String targetRoomImageAssetName = getRoomImageAssetName(targetRoomName);
-            String movingIntoNextRoomMessage = "You head to the " + targetRoomName;
+            String movingIntoNextRoomMessage = "You head to the cunt " + targetRoomName;
             String[] commandMessage = movingIntoNextRoomMessage.split("\\n");
-            return new CommandResult(Arrays.asList(commandMessage), true, true,
+            player.setCurrentRoom(targetRoom);
+            return new CommandResult(Arrays.asList(commandMessage), true, false,
                     targetRoomImageAssetName, "Image");
         }
     }
@@ -161,11 +162,11 @@ public class GameEngine {
             return new CommandResult(Arrays.asList(displayMessageArray), false, false,
                     roomImageAssetName, "Image");
         }
-        String object = optionalTarget.get();
+        String object = optionalTarget.get().trim().toLowerCase();
         Iterator<Item> itemIterator = playerCurrentRoom.getItemList().iterator();
         while (itemIterator.hasNext()) {
             Item item = itemIterator.next();
-            if (object.contains(item.getName())) {
+            if (object.contains(item.getName().trim().toLowerCase())) {
                 player.addItemToInventory(item);
                 itemIterator.remove();
                 String foundItemMessage = player.getName() + " took " + item.getName();
@@ -301,7 +302,7 @@ public class GameEngine {
     }
 
     public CommandResult handleSave() {
-        System.out.println("TO Implement: player" + player.getName() + "wants game progress to be saved");
+        System.out.println("To Implement: player" + player.getName() + " wants game progress to be saved");
         String saved = "Game not saved because save manager not implemented yet";
         String[] commandMessage = saved.split("\\p{Punct}");
         Room playerCurrentRoom = player.getCurrentRoom();
