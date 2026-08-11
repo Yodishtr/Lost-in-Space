@@ -10,12 +10,24 @@ public class Player {
     private Integer health;
     private String name;
     private Integer enemiesDefeated;
+    private Integer enemiesToKillToWin;
+    private Integer numberOfItemsRequiredToWin;
 
     public Player(Room currentRoom, Integer health, String name) {
         this.currentRoom = currentRoom;
         this.health = health;
         this.name = name;
         this.enemiesDefeated = 0;
+    }
+
+    public Player(Room currentRoom, Integer health, String name, Integer numberOfItemsRequiredToWin,
+                  Integer enemiesToKillToWin) {
+        this.currentRoom = currentRoom;
+        this.health = health;
+        this.name = name;
+        this.enemiesDefeated = 0;
+        this.numberOfItemsRequiredToWin = numberOfItemsRequiredToWin;
+        this.enemiesToKillToWin = enemiesToKillToWin;
     }
 
     // Getters
@@ -37,6 +49,14 @@ public class Player {
 
     public Integer getEnemiesDefeated() {
         return enemiesDefeated;
+    }
+
+    public Integer getEnemiesToKillToWin() {
+        return enemiesToKillToWin;
+    }
+
+    public Integer getNumberOfItemsRequiredToWin() {
+        return numberOfItemsRequiredToWin;
     }
 
     // Setters
@@ -71,5 +91,13 @@ public class Player {
 
     public void addEnemyDefeated() {
         this.enemiesDefeated++;
+    }
+
+    public void setEnemiesToKillToWin(Integer enemiesToKillToWin) {
+        this.enemiesToKillToWin = enemiesToKillToWin;
+    }
+
+    public void setNumberOfItemsRequiredToWin(Integer numberOfItemsRequiredToWin) {
+        this.numberOfItemsRequiredToWin = numberOfItemsRequiredToWin;
     }
 }

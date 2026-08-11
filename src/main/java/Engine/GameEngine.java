@@ -19,7 +19,8 @@ public class GameEngine {
         this.commandParser = new CommandParser();
         this.gameState = gameState;
         this.roomsMap = WorldBuilder.buildWorld();
-        this.player = new Player(roomsMap.get("Airlock"), 100, playerName);
+        this.player = new Player(roomsMap.get("Airlock"), 100, playerName, 2,
+                2);
     }
 
     public GameEngine(GameState gameState, Player player) {
@@ -192,6 +193,7 @@ public class GameEngine {
                     roomImageAssetName, "Image");
         }
         String object = optionalTarget.get();
+
         if (object.equals("escape pod")){
             int count = 0;
             for (Item item : player.getInventory().values()) {
@@ -199,19 +201,21 @@ public class GameEngine {
                     count++;
                 }
             }
-            if (count < 2 && !playerCurrentRoom.getName().equals("Airlock")) {
+            boolean numberWinCondition = (count == player.getNumberOfItemsRequiredToWin()) &&
+                    (player.getEnemiesDefeated() == player.getEnemiesToKillToWin());
+            if (!numberWinCondition && !playerCurrentRoom.getName().equals("Airlock")) {
                 String cantLeaveYetMessage = player.getName() + " cannot leave yet.\nYou do not have the required " +
-                        "items.";
+                        "items and have not eliminated the threats yet.";
                 String[] commandMessage = cantLeaveYetMessage.split("\\n");
                 return new CommandResult(Arrays.asList(commandMessage), false, false,
                         roomImageAssetName, "Image");
-            } else if (count < 2 && playerCurrentRoom.getName().equals("Airlock")) {
+            } else if (!numberWinCondition && playerCurrentRoom.getName().equals("Airlock")) {
                 String notEnoughItemMessage = player.getName() + " needs to collect the necessary items then " +
                         "head to the Airlock";
                 String[] commandMessage = notEnoughItemMessage.split("\\p{Punct}");
                 return new CommandResult(Arrays.asList(commandMessage), false, false,
                         roomImageAssetName, "Image");
-            } else if (count == 2 && !playerCurrentRoom.getName().equals("Airlock")) {
+            } else if (numberWinCondition && !playerCurrentRoom.getName().equals("Airlock")) {
                 String notInTheRightRoom = player.getName() + " is not in the right room.\nThe escape pod can only be " +
                         "accessed by the Airlock.";
                 String[] commandMessage = notInTheRightRoom.split("\\n");
@@ -222,30 +226,44 @@ public class GameEngine {
             }
         }
 
-        if (playerCurrentRoom.getOptionalEnemy().isPresent()) {
-            Enemy enemyInTheRoom = playerCurrentRoom.getOptionalEnemy().get();
-            String fatalItem = enemyInTheRoom.getRequiredItemName();
-            if (object.contains(fatalItem)) {
-                enemyInTheRoom.setResolved(true);
-                String[] successMessage = enemyInTheRoom.getSuccessMessage().split("\\p{Punct}");
-                return new CommandResult(Arrays.asList(successMessage), false, false,
-                        roomImageAssetName, "Image");
-            } else {
-                String[] failureMessage = enemyInTheRoom.getFailureMessage().split("\\p{Punct}");
-                player.setHealth(player.getHealth() - 50);
-                if (player.getHealth() <= 0) {
-                    return gameOutcome(GameState.LOST);
-                }
-                return new CommandResult(Arrays.asList(failureMessage), false, false,
-                        roomImageAssetName, "Image");
+        boolean present = false;
+        for (Item item : player.getInventory().values()) {
+            if (object.contains(item.getName().trim().toLowerCase())) {
+                present = true;
             }
         }
+        if (!present) {
+            String notInInventory = object + " is not in the inventory.\n";
+            String[] commandMessage = notInInventory.split("\\n");
+            return new CommandResult(Arrays.asList(commandMessage), false, false,
+                    roomImageAssetName, "Image");
+        } else {
+            if (playerCurrentRoom.getOptionalEnemy().isPresent()) {
+                Enemy enemyInTheRoom = playerCurrentRoom.getOptionalEnemy().get();
+                String fatalItem = enemyInTheRoom.getRequiredItemName();
+                if (object.contains(fatalItem)) {
+                    enemyInTheRoom.setResolved(true);
+                    player.addEnemyDefeated();
+                    String[] successMessage = enemyInTheRoom.getSuccessMessage().split("\\p{Punct}");
+                    return new CommandResult(Arrays.asList(successMessage), false, false,
+                            roomImageAssetName, "Image");
+                } else {
+                    String[] failureMessage = enemyInTheRoom.getFailureMessage().split("\\p{Punct}");
+                    player.setHealth(player.getHealth() - 50);
+                    if (player.getHealth() <= 0) {
+                        return gameOutcome(GameState.LOST);
+                    }
+                    return new CommandResult(Arrays.asList(failureMessage), false, false,
+                            roomImageAssetName, "Image");
+                }
+            } else {
+                String randomUseMessage = player.getName() + " used " + object + ".Nothing happened.";
+                String[] commandMessage = randomUseMessage.split("\\p{Punct}");
+                return new CommandResult(Arrays.asList(commandMessage), false, false,
+                        roomImageAssetName, "Image");
 
-        String randomUseMessage = player.getName() + " used " + object;
-        String[] commandMessage = randomUseMessage.split("\\p{Punct}");
-        return new CommandResult(Arrays.asList(commandMessage), false, false,
-                roomImageAssetName, "Image");
-
+            }
+        }
     }
 
     public CommandResult handleLook(Command command) {

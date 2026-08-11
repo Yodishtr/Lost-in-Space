@@ -87,7 +87,8 @@ public class GameEngineTest {
             }
         }
 
-        fakePlayer = new Player(startingRoom, 100, "HeroTest");
+        fakePlayer = new Player(startingRoom, 100, "HeroTest", 1,
+                1);
         fakeGameEnginePlaying = new GameEngine(GameState.PLAYING, fakePlayer);
         fakeGameEngineIntro = new GameEngine(GameState.INTRO, fakePlayer);
     }
@@ -294,4 +295,48 @@ public class GameEngineTest {
     }
 
     // need to test handleUse, handleLook, handleInventory, handleSave and handleUnknown
+    @Test
+    @DisplayName("handleUse method with no object specified")
+    void testUseNothing() {
+        Command.CommandType useCommand = Command.CommandType.USE;
+        Command command = new Command(useCommand, null);
+        CommandResult commandResult = fakeGameEnginePlaying.handleUse(command);
+        assertAll("Nothing to use specified",
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertEquals(fakePlayer.getName() +
+                        " did not specify an object to use from his inventory",
+                        commandResult.getDisplayMessage().getFirst())
+                );
+    }
+
+    @Test
+    @DisplayName("handleUse with an object not present in inventory provided")
+    void testUseWithObjectNotInInventory() {
+        Command.CommandType useCommand = Command.CommandType.USE;
+        Command command = new Command(useCommand, "baja blast");
+        CommandResult commandResult = fakeGameEnginePlaying.handleUse(command);
+        assertAll("Object not in inventory",
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertEquals("baja blast is not in the inventory.",
+                        commandResult.getDisplayMessage().getFirst())
+                );
+    }
+
+    @Test
+    @DisplayName("handleUse with target being escape pod while not being in the airlock & no winning items and " +
+            "no enemies killed")
+    void testUseEscapePod() {
+        fakePlayer.setCurrentRoom(fakeWorld.get("Cargo Bay"));
+        Command.CommandType useCommand = Command.CommandType.USE;
+        Command command = new Command(useCommand, "escape pod");
+        CommandResult commandResult = fakeGameEnginePlaying.handleUse(command);
+        assertAll("trying to escape with no enemies defeated and no winning items",
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertEquals(fakePlayer.getName() + " cannot leave yet.",
+                        commandResult.getDisplayMessage().getFirst())
+                );
+    }
 }
