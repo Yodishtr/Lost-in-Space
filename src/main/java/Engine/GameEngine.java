@@ -211,7 +211,7 @@ public class GameEngine {
                         roomImageAssetName, "Image");
             } else if (!numberWinCondition && playerCurrentRoom.getName().equals("Airlock")) {
                 String notEnoughItemMessage = player.getName() + " needs to collect the necessary items then " +
-                        "head to the Airlock";
+                        "head to the Airlock.";
                 String[] commandMessage = notEnoughItemMessage.split("\\p{Punct}");
                 return new CommandResult(Arrays.asList(commandMessage), false, false,
                         roomImageAssetName, "Image");
@@ -228,7 +228,7 @@ public class GameEngine {
 
         boolean present = false;
         for (Item item : player.getInventory().values()) {
-            if (object.contains(item.getName().trim().toLowerCase())) {
+            if (object.trim().toLowerCase().contains(item.getName().trim().toLowerCase())) {
                 present = true;
             }
         }
@@ -240,7 +240,7 @@ public class GameEngine {
         } else {
             if (playerCurrentRoom.getOptionalEnemy().isPresent()) {
                 Enemy enemyInTheRoom = playerCurrentRoom.getOptionalEnemy().get();
-                String fatalItem = enemyInTheRoom.getRequiredItemName();
+                String fatalItem = enemyInTheRoom.getRequiredItemName().trim().toLowerCase();
                 if (object.contains(fatalItem)) {
                     enemyInTheRoom.setResolved(true);
                     player.addEnemyDefeated();

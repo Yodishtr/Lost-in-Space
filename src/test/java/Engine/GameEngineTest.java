@@ -339,4 +339,143 @@ public class GameEngineTest {
                         commandResult.getDisplayMessage().getFirst())
                 );
     }
+
+    @Test
+    @DisplayName("handleUse with target being escape pod while being in airlock but no win condition")
+    void testUseEscapePodWithAirlockButNoWinCondition() {
+        Command.CommandType useCommand = Command.CommandType.USE;
+        Command command = new Command(useCommand, "escape pod");
+        CommandResult commandResult = fakeGameEnginePlaying.handleUse(command);
+        assertAll("no enemies + no winning items but player in airlock",
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertEquals(fakePlayer.getName() + " needs to collect the necessary items then " +
+                        "head to the Airlock", commandResult.getDisplayMessage().getFirst())
+                );
+    }
+
+    @Test
+    @DisplayName("handleUse with target being escape pod while being in airlock but no win condition")
+    void testAirlockNoEnemiesButWinningItem() {
+        // got winning item but no enemies defeated
+        fakePlayer.addItemToInventory(new Item("Shiny", true));
+        Command.CommandType useCommand = Command.CommandType.USE;
+        Command command = new Command(useCommand, "escape pod");
+        CommandResult commandResult = fakeGameEnginePlaying.handleUse(command);
+        assertAll("no enemies killed but got winning item and in airlock",
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertEquals(fakePlayer.getName() + " needs to collect the necessary items then " +
+                        "head to the Airlock", commandResult.getDisplayMessage().getFirst())
+        );
+    }
+
+    @Test
+    @DisplayName("handleUse with target being escape pod while being in airlock but no win condition")
+    void testAirlockEnemiesKilledButNoWinningItem() {
+        // killed enemies but no winning item
+        fakePlayer.addEnemyDefeated();
+        Command.CommandType useCommand = Command.CommandType.USE;
+        Command command = new Command(useCommand, "escape pod");
+        CommandResult commandResult = fakeGameEnginePlaying.handleUse(command);
+        assertAll("enemies killed but got no winning item and in airlock",
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertEquals(fakePlayer.getName() + " needs to collect the necessary items then " +
+                        "head to the Airlock", commandResult.getDisplayMessage().getFirst()));
+    }
+
+    @Test
+    @DisplayName("handleUse with target being escape pod but now have winning condition except not in airlock")
+    void testWinningConditionButNoAirlock() {
+        fakePlayer.setCurrentRoom(fakeWorld.get("Cargo Bay"));
+        fakePlayer.addEnemyDefeated();
+        fakePlayer.addItemToInventory(new Item("Shiny", true));
+        Command.CommandType useCommand = Command.CommandType.USE;
+        Command command = new Command(useCommand, "escape pod");
+        CommandResult commandResult = fakeGameEnginePlaying.handleUse(command);
+        assertAll("Winning Condition but not in airlock",
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertEquals(fakePlayer.getName() + " is not in the right room.",
+                        commandResult.getDisplayMessage().getFirst())
+                );
+    }
+
+    @Test
+    @DisplayName("handleUse with target being escape pod and winning condition and airlock all good")
+    void testWinningConditionAndAirlockAllGood() {
+        fakePlayer.addEnemyDefeated();
+        fakePlayer.addItemToInventory(new Item("Shiny", true));
+        Command.CommandType useCommand = Command.CommandType.USE;
+        Command command = new Command(useCommand, "escape pod");
+        CommandResult commandResult = fakeGameEnginePlaying.handleUse(command);
+        assertAll("Game Won",
+                () -> assertTrue(commandResult.isGameOver()),
+                () -> assertTrue(commandResult.isChangeImage()),
+                () -> assertEquals("Congratulations, you won!", commandResult.getDisplayMessage().getFirst())
+                );
+    }
+
+    @Test
+    @DisplayName("handleUse with a tool but no enemies nearby to use it on")
+    void testToolWithNoEnemiesNearby() {
+        fakePlayer.addItemToInventory(new Item("Shiny", true));
+        Command.CommandType useCommand = Command.CommandType.USE;
+        Command command = new Command(useCommand, "shiny");
+        CommandResult commandResult = fakeGameEnginePlaying.handleUse(command);
+        assertAll("no enemies nearby to use tool on",
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertEquals(fakePlayer.getName() + " used " + "shiny",
+                        commandResult.getDisplayMessage().getFirst())
+                );
+    }
+
+    @Test
+    @DisplayName("handleUse with a tool with enemy nearby and correct tool to kill it")
+    void testKillEnemyWithRightTool() {
+        fakePlayer.addItemToInventory(new Item("Tool", "A tool to kill enemy", true));
+        fakePlayer.setCurrentRoom(fakeWorld.get("Armory"));
+        Command.CommandType useCommand = Command.CommandType.USE;
+        Command command = new Command(useCommand, "tool");
+        CommandResult commandResult = fakeGameEnginePlaying.handleUse(command);
+        assertAll("Enemy killed",
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertEquals("You not Woo", commandResult.getDisplayMessage().getFirst())
+                );
+    }
+
+    @Test
+    @DisplayName("handleUse with an item that cannot kill nearby enemy")
+    void testCannotKillEnemyButDontDieYourself() {
+        fakePlayer.addItemToInventory(new Item("Shiny", false));
+        fakePlayer.setCurrentRoom(fakeWorld.get("Armory"));
+        Command.CommandType useCommand = Command.CommandType.USE;
+        Command command = new Command(useCommand, "shiny");
+        CommandResult commandResult = fakeGameEnginePlaying.handleUse(command);
+        assertAll("enemy beats the breaks off you",
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertEquals("You Woo", commandResult.getDisplayMessage().getFirst())
+                );
+    }
+
+    @Test
+    @DisplayName("handleUse with an item that cannot kill nearby enemy who then kills you")
+    void testCannotKillEnemyAndEnemyKillsYou() {
+        fakePlayer.addItemToInventory(new Item("Shiny", false));
+        fakePlayer.setCurrentRoom(fakeWorld.get("Armory"));
+        fakePlayer.setHealth(50);
+        Command.CommandType useCommand = Command.CommandType.USE;
+        Command command = new Command(useCommand, "shiny");
+        CommandResult commandResult = fakeGameEnginePlaying.handleUse(command);
+        assertAll("got cracked by enemy",
+                () -> assertTrue(commandResult.isChangeImage()),
+                () -> assertTrue(commandResult.isGameOver()),
+                () -> assertEquals("You Died!", commandResult.getDisplayMessage().getFirst())
+        );
+    }
+
 }
