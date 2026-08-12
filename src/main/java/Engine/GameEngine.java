@@ -80,7 +80,7 @@ public class GameEngine {
             return new CommandResult(Arrays.asList(splitLostMessage), true, true,
                     "/images/lost.png", "Image");
         } else {
-            String wronglyCalled = "This is a clear wrong use of this method.\nBecause the game state is " +
+            String wronglyCalled = "This is a clear wrong usage of this method.\nBecause the game state is " +
                     gameState.toString();
             String[] splitWronglyCalledMessage = wronglyCalled.split("\\n");
             return new CommandResult(Arrays.asList(splitWronglyCalledMessage), false, false,
@@ -144,7 +144,7 @@ public class GameEngine {
         } else {
             String targetRoomName = targetRoom.getName();
             String targetRoomImageAssetName = getRoomImageAssetName(targetRoomName);
-            String movingIntoNextRoomMessage = "You head to the cunt " + targetRoomName;
+            String movingIntoNextRoomMessage = "You head to the " + targetRoomName;
             String[] commandMessage = movingIntoNextRoomMessage.split("\\n");
             player.setCurrentRoom(targetRoom);
             return new CommandResult(Arrays.asList(commandMessage), true, false,
@@ -277,10 +277,10 @@ public class GameEngine {
 
     private String buildLookAroundMessage(Room currentRoom) {
         StringBuilder lookAroundMessage = new StringBuilder();
-        lookAroundMessage.append(currentRoom.getDescription()).append(" ");
+        lookAroundMessage.append(currentRoom.getDescription()).append("\n");
         List<Item> items = currentRoom.getItemList();
         lookAroundMessage.append(currentRoom.getName())
-                .append(" currently has  ")
+                .append(" currently has ")
                 .append(items.size())
                 .append(" items.\n");
 
@@ -330,6 +330,17 @@ public class GameEngine {
     }
 
     public CommandResult handleUnknown() {
+        Room playerCurrentRoom = player.getCurrentRoom();
+        String roomImageAssetName = getRoomImageAssetName(playerCurrentRoom.getName());
+        String unknownCommand = "I don't understand that command.\n" +
+                "Try actions like 'go north', 'take [item]', 'use [item]', 'look', or 'inventory'.";
+        String[] commandMessage = unknownCommand.split("\\n");
+        return new CommandResult(Arrays.asList(commandMessage), false, false,
+                roomImageAssetName, "Image");
+    }
+
+    // tests command parser combo with handleUnknown
+    public CommandResult handleUnknown(CommandType command) {
         Room playerCurrentRoom = player.getCurrentRoom();
         String roomImageAssetName = getRoomImageAssetName(playerCurrentRoom.getName());
         String unknownCommand = "I don't understand that command.\n" +

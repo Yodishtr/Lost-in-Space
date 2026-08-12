@@ -2,7 +2,6 @@ package Engine;
 
 import Model.*;
 import dto.CommandResult;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -238,7 +237,7 @@ public class GameEngineTest {
                 () -> assertFalse(commandResult.isChangeImage()),
                 () -> assertEquals("cargo_bay", commandResult.getDisplayAssetPath()),
                 () -> assertEquals("Image", commandResult.getDisplayAssetType()),
-                () -> assertTrue(fakeWorld.get("Cargo Bay").getItemList().isEmpty()),
+                () -> assertTrue(fakeWorld.get("Cargo Bay").getItemList().size() == 1),
                 () -> assertEquals(fakePlayer.getName() + " took " + "Tool",
                         commandResult.getDisplayMessage().getFirst()),
                 () -> assertFalse(fakePlayer.getInventory().isEmpty())
@@ -475,6 +474,211 @@ public class GameEngineTest {
                 () -> assertTrue(commandResult.isChangeImage()),
                 () -> assertTrue(commandResult.isGameOver()),
                 () -> assertEquals("You Died!", commandResult.getDisplayMessage().getFirst())
+        );
+    }
+
+    @Test
+    @DisplayName("gameOutcome method returns correct value for when it is called with gamestates unknown not lost or " +
+            "won")
+    void testUnknownGameState() {
+        CommandResult outcome = fakeGameEnginePlaying.gameOutcome(GameState.UNKNOWN);
+        assertAll("Unknown game state",
+                () -> assertFalse(outcome.isGameOver()),
+                () -> assertFalse(outcome.isChangeImage()),
+                () -> assertEquals("This is a clear wrong usage of this method.",
+                        outcome.getDisplayMessage().getFirst()),
+                () -> assertEquals("", outcome.getDisplayAssetPath()),
+                () -> assertEquals("", outcome.getDisplayAssetType())
+                );
+    }
+
+    @Test
+    @DisplayName("gameOutcome method returns correct value when called with game state playing")
+    void testGameStatePlaying() {
+        CommandResult outcome = fakeGameEnginePlaying.gameOutcome(GameState.PLAYING);
+        assertAll("playing game state",
+                () -> assertFalse(outcome.isChangeImage()),
+                () -> assertFalse(outcome.isGameOver()),
+                () -> assertEquals("This is a clear wrong usage of this method.",
+                        outcome.getDisplayMessage().getFirst()),
+                () -> assertEquals("", outcome.getDisplayAssetPath()),
+                () -> assertEquals("", outcome.getDisplayAssetType())
+                );
+    }
+
+    @Test
+    @DisplayName("gameOutcome method returns correct value when called with game state intro")
+    void testGameStateIntro() {
+        CommandResult outcome = fakeGameEnginePlaying.gameOutcome(GameState.INTRO);
+        assertAll("intro game state",
+                () -> assertFalse(outcome.isChangeImage()),
+                () -> assertFalse(outcome.isGameOver()),
+                () -> assertEquals("This is a clear wrong usage of this method.",
+                        outcome.getDisplayMessage().getFirst()),
+                () -> assertEquals("", outcome.getDisplayAssetPath()),
+                () -> assertEquals("", outcome.getDisplayAssetType())
+        );
+    }
+
+    @Test
+    @DisplayName("gameOutcome method returns correct value when called with game state won")
+    void testGameStateWon() {
+        CommandResult outcome = fakeGameEnginePlaying.gameOutcome(GameState.WON);
+        assertAll("Won game state",
+                () -> assertTrue(outcome.isGameOver()),
+                () -> assertTrue(outcome.isChangeImage()),
+                () -> assertEquals("Congratulations, you won!", outcome.getDisplayMessage().getFirst()),
+                () -> assertEquals("/images/won.png", outcome.getDisplayAssetPath()),
+                () -> assertEquals("Image", outcome.getDisplayAssetType())
+                );
+    }
+
+    @Test
+    @DisplayName("gameOutcome method returns correct value when called with game state lost")
+    void testGameStateLost() {
+        CommandResult outcome = fakeGameEnginePlaying.gameOutcome(GameState.LOST);
+        assertAll("Lost game state",
+                () -> assertTrue(outcome.isGameOver()),
+                () -> assertTrue(outcome.isChangeImage()),
+                () -> assertEquals("You Died!", outcome.getDisplayMessage().getFirst()),
+                () -> assertEquals("/images/lost.png", outcome.getDisplayAssetPath()),
+                () -> assertEquals("Image", outcome.getDisplayAssetType())
+                );
+    }
+
+    @Test
+    @DisplayName("handleUnknown method")
+    void testHandleUnknown() {
+        CommandParser parser = fakeGameEnginePlaying.getCommandParser();
+        Command command = parser.parseCommand("iwjnfkjanf osjnfkgjsnfk");
+        Command.CommandType commandType = command.getVerb();
+        CommandResult commandResult = fakeGameEnginePlaying.handleUnknown(commandType);
+        assertAll("unknown command",
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertEquals("I don't understand that command.",
+                        commandResult.getDisplayMessage().getFirst())
+                );
+    }
+
+    @Test
+    @DisplayName("handleInventory with an empty inventory and correct command formation")
+    void testEmptyInventory() {
+        Command.CommandType commandType = Command.CommandType.INVENTORY;
+        Command command = new Command(commandType, null);
+        CommandResult commandResult = fakeGameEnginePlaying.handleInventory(command);
+        assertAll("empty inventory",
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertEquals(fakePlayer.getName() + " has " + fakePlayer.getInventory().size() +
+                                " items.", commandResult.getDisplayMessage().getFirst()),
+                () -> assertEquals("airlock", commandResult.getDisplayAssetPath()),
+                () -> assertEquals("Image", commandResult.getDisplayAssetType())
+                );
+    }
+
+    @Test
+    @DisplayName("handleInventory with an item in the inventory and correct command formation")
+    void testInventory() {
+        fakePlayer.addItemToInventory(new Item("Shiny", false));
+        Command.CommandType commandType = Command.CommandType.INVENTORY;
+        Command command = new Command(commandType, null);
+        CommandResult commandResult = fakeGameEnginePlaying.handleInventory(command);
+        assertAll("one inventory",
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertTrue(fakePlayer.getInventory().size() == 1),
+                () -> assertEquals(fakePlayer.getName() + " has " + fakePlayer.getInventory().size() +
+                        " items.", commandResult.getDisplayMessage().getFirst()),
+                () -> assertEquals("airlock", commandResult.getDisplayAssetPath()),
+                () -> assertEquals("Image", commandResult.getDisplayAssetType())
+        );
+    }
+
+    @Test
+    @DisplayName("handleInventory with an empty inventory and then a non-empty inventory but both have wrongly " +
+            "formed commands")
+    void testWronglyFormedInventoryCommand() {
+        Command.CommandType commandType = Command.CommandType.INVENTORY;
+        Command command = new Command(commandType, "my bag");
+        CommandResult commandResult = fakeGameEnginePlaying.handleInventory(command);
+        assertAll("empty inventory",
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertEquals(fakePlayer.getName() + " has " + fakePlayer.getInventory().size() +
+                        " items.", commandResult.getDisplayMessage().getFirst()),
+                () -> assertEquals("airlock", commandResult.getDisplayAssetPath()),
+                () -> assertEquals("Image", commandResult.getDisplayAssetType())
+        );
+
+        fakePlayer.addItemToInventory(new Item("Shiny", false));
+        CommandResult commandResult2 = fakeGameEnginePlaying.handleInventory(command);
+        assertAll("empty inventory",
+                () -> assertFalse(commandResult2.isChangeImage()),
+                () -> assertFalse(commandResult2.isGameOver()),
+                () -> assertEquals(fakePlayer.getName() + " has " + fakePlayer.getInventory().size() +
+                        " items.", commandResult2.getDisplayMessage().getFirst()),
+                () -> assertEquals("airlock", commandResult2.getDisplayAssetPath()),
+                () -> assertEquals("Image", commandResult2.getDisplayAssetType())
+        );
+    }
+
+    @Test
+    @DisplayName("handleLook with an empty room but well formed command")
+    void testEmptyRoomCommand() {
+        Command.CommandType commandType = Command.CommandType.LOOK;
+        Command command = new Command(commandType, null);
+        CommandResult commandResult = fakeGameEnginePlaying.handleLook(command);
+        assertAll("empty room",
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertTrue(fakePlayer.getCurrentRoom().getName().equals("Airlock")),
+                () -> assertTrue(fakePlayer.getCurrentRoom().getItemList().size() == 0),
+                () -> assertEquals(fakePlayer.getCurrentRoom().getName() + " currently has " +
+                        fakePlayer.getCurrentRoom().getItemList().size() + " items.",
+                        commandResult.getDisplayMessage().get(1)),
+                () -> assertEquals("airlock", commandResult.getDisplayAssetPath()),
+                () -> assertEquals("Image", commandResult.getDisplayAssetType())
+                );
+    }
+
+    @Test
+    @DisplayName("handleLook with a room with an item but well formed command")
+    void testLookWithANonEmptyRoom() {
+        fakePlayer.setCurrentRoom(fakeWorld.get("Cargo Bay"));
+        Command.CommandType commandType = Command.CommandType.LOOK;
+        Command command = new Command(commandType, null);
+        CommandResult commandResult = fakeGameEnginePlaying.handleLook(command);
+        assertAll("non-empty room",
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertTrue(fakePlayer.getCurrentRoom().getName().equals("Cargo Bay")),
+                () -> assertTrue(fakePlayer.getCurrentRoom().getItemList().size() == 2),
+                () -> assertEquals(fakePlayer.getCurrentRoom().getName() + " currently has " +
+                                fakePlayer.getCurrentRoom().getItemList().size() + " items.",
+                        commandResult.getDisplayMessage().get(1)),
+                () -> assertEquals("cargo_bay", commandResult.getDisplayAssetPath()),
+                () -> assertEquals("Image", commandResult.getDisplayAssetType())
+        );
+    }
+
+    @Test
+    @DisplayName("handleLook with a non empty room but a wrongly formed command")
+    void testWronglyFormedRoomCommand() {
+        fakePlayer.setCurrentRoom(fakeWorld.get("Cargo Bay"));
+        Command.CommandType commandType = Command.CommandType.LOOK;
+        Command command = new Command(commandType, "ougabougaksjnfkjsn");
+        CommandResult commandResult = fakeGameEnginePlaying.handleLook(command);
+        assertAll("non-empty room",
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertTrue(fakePlayer.getCurrentRoom().getName().equals("Cargo Bay")),
+                () -> assertTrue(fakePlayer.getCurrentRoom().getItemList().size() == 2),
+                () -> assertEquals(fakePlayer.getCurrentRoom().getName() + " currently has " +
+                                fakePlayer.getCurrentRoom().getItemList().size() + " items.",
+                        commandResult.getDisplayMessage().get(1)),
+                () -> assertEquals("cargo_bay", commandResult.getDisplayAssetPath()),
+                () -> assertEquals("Image", commandResult.getDisplayAssetType())
         );
     }
 

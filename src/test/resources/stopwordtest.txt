@@ -1,0 +1,49 @@
+# ==============================================================================
+# COMMAND PARSER STOP WORDS
+# Words ignored during tokenization to isolate verbs, directions, and targets.
+# ==============================================================================
+
+# Articles & Quantifiers
+the
+a
+an
+some
+any
+all
+
+# Prepositions & Connectives
+at
+to
+in
+on
+into
+onto
+from
+with
+of
+for
+about
+towards
+toward
+through
+under
+over
+by
+
+# Filler Pronouns & Pointers
+it
+this
+that
+these
+those
+my
+your
+
+# Filler Verbs / Helping Auxiliary Verbs
+please
+try
+kindly
+would
+could
+should
+can

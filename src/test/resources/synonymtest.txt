@@ -1,0 +1,24 @@
+# ==============================================================================
+# COMMAND SYNONYM MAPPINGS
+# Format: COMMAND_TYPE: synonym1, synonym2, ...
+# ==============================================================================
+
+# Movement & Navigation
+GO: go, move, walk, head, travel, proceed, run, step, enter, exit, climb, pass, sprint, jog, march, advance, cross, venture, journey, navigate, relocate, turn, path, rush, fly, crawl, sneaking, sneak, g, w
+
+# Item Acquisition & Retrieval
+TAKE: take, grab, pick, get, collect, obtain, acquire, snatch, retrieve, hold, steal, pocket, gather, secure, claim, snatch, swipe, pluck, lift, seize, t
+
+# Item Interaction & Deployment
+USE: use, apply, activate, deploy, interact, operate, trigger, turn, press, push, flip, switch, ignite, engage, utilize, manipulate, attach, connect, insert, u
+
+# Observation, Inspection & Searching
+LOOK: look, examine, inspect, check, view, observe, read, scan, search, stare, scrutinize, peer, study, survey, investigate, sight, l, x
+
+# Inventory Management
+INVENTORY: inventory, items, bag, backpack, gear, equipment, carrying, hold, possessions, stuff, pouch, sack, stash, i, inv
+
+# Game State Operations & Meta Commands
+SAVE: save, record, store, keep, preserve, checkpoint
+QUIT: quit, exit, stop, leave, end, terminate, abort, close, q
+HELP: help, commands, info, instructions, guide, manual, hint, hints, ?, h
