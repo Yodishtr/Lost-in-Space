@@ -16,10 +16,10 @@ public class WorldBuilder {
     public static final String ARMORY = "Armory";
     public static final String AIRLOCK = "Airlock";
     public static final String MEDICAL_BAY = "Medical Bay";
-    public static final String NORTH = "North";
-    public static final String EAST = "East";
-    public static final String SOUTH = "South";
-    public static final String WEST = "West";
+    public static final String NORTH = "NORTH";
+    public static final String EAST = "EAST";
+    public static final String SOUTH = "SOUTH";
+    public static final String WEST = "WEST";
     // use the storiesbuilder utility class to fill out the description of each room
 
     public static Map<String, Room> buildWorld() {

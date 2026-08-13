@@ -15,10 +15,6 @@ public class CommandParser {
         stopWordSet = SynonymBuilder.stopWordsBuilder("stopwords.txt");
     }
 
-    public void setStopWordSet(Set<String> stopWordSetArg) {
-        stopWordSet = stopWordSetArg;
-    }
-
     // need private helpers
     // normalizing, tokenizing (eseentially split the iput into list of words),
     // removal of stop words, resolve the verb by using the synonym map,

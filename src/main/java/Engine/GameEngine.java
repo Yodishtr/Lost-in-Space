@@ -115,7 +115,7 @@ public class GameEngine {
             return new CommandResult(Arrays.asList(splitDisplayMessage), false, false,
                     roomImageAssetName, "Image");
         }
-        String direction = optionalTarget.get();
+        String direction = optionalTarget.get().toUpperCase();
         Room targetRoom = playerCurrentRoom.getExits().get(direction);
         boolean enemyDefeated = playerCurrentRoom.getOptionalEnemy().
                 map(enemy -> enemy.isResolved())

@@ -33,31 +33,31 @@ public class GameEngineTest {
         for (Map.Entry<String, Room> entry : fakeWorld.entrySet()) {
             String name = entry.getKey();
             Map<String, Room> exitMap = entry.getValue().getExits();
-            String[] directions = {"North", "East", "South", "West"};
+            String[] directions = {"NORTH", "EAST", "SOUTH", "WEST"};
             switch (name) {
                 case "Airlock":
                     for (String direction : directions) {
-                        if (direction.equals("North")) {
-                            exitMap.put("North", null);
-                        } else if (direction.equals("East")) {
-                            exitMap.put("East", enemyRoom);
-                        } else if (direction.equals("South")) {
-                            exitMap.put("South", itemRoom);
-                        } else if (direction.equals("West")) {
-                            exitMap.put("West", null);
+                        if (direction.equals("NORTH")) {
+                            exitMap.put("NORTH", null);
+                        } else if (direction.equals("EAST")) {
+                            exitMap.put("EAST", enemyRoom);
+                        } else if (direction.equals("SOUTH")) {
+                            exitMap.put("SOUTH", itemRoom);
+                        } else if (direction.equals("WEST")) {
+                            exitMap.put("WEST", null);
                         }
                     }
                     break;
                 case "Cargo Bay":
                     for (String direction : directions) {
-                        if (direction.equals("North")) {
-                            exitMap.put("North", startingRoom);
-                        } else if (direction.equals("East")) {
-                            exitMap.put("East", null);
-                        } else if (direction.equals("South")) {
-                            exitMap.put("South", null);
-                        } else if (direction.equals("West")) {
-                            exitMap.put("West", null);
+                        if (direction.equals("NORTH")) {
+                            exitMap.put("NORTH", startingRoom);
+                        } else if (direction.equals("EAST")) {
+                            exitMap.put("EAST", null);
+                        } else if (direction.equals("SOUTH")) {
+                            exitMap.put("SOUTH", null);
+                        } else if (direction.equals("WEST")) {
+                            exitMap.put("WEST", null);
                         }
                     }
                     Item tool = new Item("Tool", "A tool to kill enemy", true);
@@ -68,14 +68,14 @@ public class GameEngineTest {
                     break;
                 case "Armory":
                     for (String direction : directions) {
-                        if (direction.equals("North")) {
-                            exitMap.put("North", null);
-                        } else if (direction.equals("East")) {
-                            exitMap.put("East", null);
-                        } else if (direction.equals("South")) {
-                            exitMap.put("South", null);
-                        } else if (direction.equals("West")) {
-                            exitMap.put("West", startingRoom);
+                        if (direction.equals("NORTH")) {
+                            exitMap.put("NORTH", null);
+                        } else if (direction.equals("EAST")) {
+                            exitMap.put("EAST", null);
+                        } else if (direction.equals("SOUTH")) {
+                            exitMap.put("SOUTH", null);
+                        } else if (direction.equals("WEST")) {
+                            exitMap.put("WEST", startingRoom);
                         }
                     }
                     Enemy theBadMan = new Enemy("Bad Mon", "Tool");
@@ -680,6 +680,30 @@ public class GameEngineTest {
                 () -> assertEquals("cargo_bay", commandResult.getDisplayAssetPath()),
                 () -> assertEquals("Image", commandResult.getDisplayAssetType())
         );
+    }
+
+    @Test
+    @DisplayName("processCommand method returns correct dto with gamestate currently being playing")
+    void testProcessCommandWhilePlaying() {
+        CommandResult commandResult = fakeGameEnginePlaying.processCommand("venture South.");
+        assertAll("venture south",
+                () -> assertTrue(commandResult.isChangeImage()),
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertEquals("You head to the " + fakePlayer.getCurrentRoom().getName(),
+                        commandResult.getDisplayMessage().getFirst())
+                );
+    }
+
+    @Test
+    @DisplayName("random input")
+    void testRandomInput() {
+        CommandResult commandResult = fakeGameEnginePlaying.processCommand("nfkljasdn noksdfjn");
+        assertAll("random input",
+                () -> assertFalse(commandResult.isChangeImage()),
+                () -> assertFalse(commandResult.isGameOver()),
+                () -> assertEquals("I don't understand that command.",
+                        commandResult.getDisplayMessage().getFirst())
+                );
     }
 
 }

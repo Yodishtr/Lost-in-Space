@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CommandParserTest {
 
-    private static CommandParser parser = new CommandParser();
+    private static CommandParser parser;
 
     @BeforeAll
     @DisplayName("Instantiating the parser")
@@ -140,22 +140,6 @@ public class CommandParserTest {
     @Test
     @DisplayName("return a correctly formed command object from illicit inputs")
     void testWrongInputs() {
-        // a setup to isolate the error being in the parse method and not from the synonym builder object for only stop
-        // words test
-        // verdict: yes the issue was isolated to be in the synonym builder and that will be tested after the engine
-        // layer. reminder to remove the setter for the stopword set in command parser and the next few lines creating
-        // the hashset
-        List<String> craplist = new ArrayList<>();
-        craplist.add("the");
-        craplist.add("to");
-        craplist.add("in");
-        craplist.add("of");
-        craplist.add("a");
-        craplist.add("for");
-        craplist.add("while");
-        Set<String> stopword = new HashSet<>(craplist);
-        parser.setStopWordSet(stopword);
-
         String toParse = " the to the for a while to the the";
         String toParseAlso = " dance/wrong verb";
         String randomPunct = "the. for. a! to, the?";

@@ -50,7 +50,7 @@ public class SynonymBuilder {
     public static Set<String> stopWordsBuilder(String fillerText) {
         try (InputStream inputStream = SynonymBuilder.class.getResourceAsStream("/" + fillerText)) {
             if (inputStream == null) {
-                throw new NoSuchElementException("cannot find synonyms.txt.txt");
+                throw new NoSuchElementException("cannot find synonyms.txt");
             }
             try (BufferedReader buffReader = new BufferedReader(new InputStreamReader(inputStream,
                     StandardCharsets.UTF_8))) {

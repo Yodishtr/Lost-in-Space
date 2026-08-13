@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,5 +31,10 @@ public class StoriesBuilderTest {
         );
     }
 
-
+    @Test
+    @DisplayName("getIntro method throws the correct Exception")
+    void testExceptionThrown() {
+        assertThrows(IllegalStateException.class, () ->
+                StoriesBuilder.getIntro("swonwlwefnmlkjwnm.txt"));
+    }
 }
