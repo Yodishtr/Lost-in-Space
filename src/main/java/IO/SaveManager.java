@@ -6,6 +6,10 @@ import Model.Player;
 import Model.Room;
 import dto.SaveData;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,17 +17,32 @@ import java.util.Map;
 public class SaveManager {
 
     public static Integer save(SaveData saveData) {
-        // build the path for the save file and the directory to house it
-        Path currentPath = resolveFilePath();
-        // separate the tasks into multiple helpers:
-        // savePlayer: retrieves the player info and returns a hashmap of this info
         Map<String, String> playerSaveInfo = savePlayer(saveData.getCurrentPlayer());
-        // saveGameState: returns a string version of the current game state (intro, playing, won, lost, unknown)
         String gameStateSaveInfo = saveGameState(saveData.getCurrentGameState());
-        // saveWorld: returns a hashmap with keys being room names and values being hashmaps of the details of the rooms
         Map<String, Map<String, String>> worldSaveInfo = saveWorld(saveData.getCurrentWorld());
 
-        return 0;
+        // build the path for the save file and the directory to house it
+        Path currentPath = resolveFilePath();
+        try {
+            Files.createDirectories(currentPath.getParent());
+            try (BufferedWriter writer = Files.newBufferedWriter(currentPath, StandardCharsets.UTF_8)) {
+                // player save
+                for (String key : playerSaveInfo.keySet()) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(key).append("=").append(playerSaveInfo.get(key)).append("\n)");
+                    writer.write(sb.toString());
+                }
+                // current game state
+                StringBuilder gameStateSaveInfoBuilder = new StringBuilder();
+                gameStateSaveInfoBuilder.append("game_state=").append(gameStateSaveInfo).append("\n");
+                writer.write(gameStateSaveInfoBuilder.toString());
+
+                // world save info
+
+            }
+        } catch (IOException io) {
+            io.printStackTrace();
+        }
     }
 
     private static Path resolveFilePath() {
