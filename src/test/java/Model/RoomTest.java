@@ -18,7 +18,8 @@ public class RoomTest {
     void testConstructorTakesAllParams() {
         Map<String, Room> exits = new HashMap<>();
         List<Item> items = new ArrayList<>();
-        Room room = new Room("Airlock", "Woo", exits, items, Optional.ofNullable(null));
+        Room room = new Room("Airlock", "Woo", exits, items, Optional.ofNullable(null),
+                false);
         assertAll("Room initialization",
                 () -> assertEquals("Airlock", room.getName()),
                 () -> assertEquals("Woo", room.getDescription()),

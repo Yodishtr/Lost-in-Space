@@ -12,11 +12,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class SaveManager {
+
+    private final static Integer ROOM_NUMBER = 5;
 
     public static Integer save(SaveData saveData) {
         Map<String, String> playerSaveInfo = savePlayer(saveData.getCurrentPlayer());
@@ -51,14 +51,17 @@ public class SaveManager {
                 // world save info
                 for (String roomName : worldSaveInfo.keySet()) {
                     // need to make the necessary changes for this
-                    writer.write(roomName);
-                    writer.write(System.lineSeparator());
+                    StringBuilder roomNameBuilder = new StringBuilder();
+                    roomNameBuilder.append("room_name").append(roomName).append(System.lineSeparator());
+                    writer.write(roomNameBuilder.toString());
                     for (String roomInfo : worldSaveInfo.get(roomName).keySet()) {
                         StringBuilder sb = new StringBuilder();
                         sb.append(roomInfo).append("=").append(worldSaveInfo.get(roomName).get(roomInfo))
                                 .append(System.lineSeparator());
                         writer.write(sb.toString());
                     }
+                    writer.write(sectionSeparator);
+                    writer.newLine();
                 }
                 return 1;
             }
@@ -106,10 +109,28 @@ public class SaveManager {
                 GameState currentGameState = GameState.valueOf(gameStateSaveInfo[0]);
                 reader.readLine();
 
-                while (line != null && !line.startsWith("*")) {
-
-                }
                 Map<String, Map<String, String>> savedGameWorldInfo = new HashMap<>();
+                for (int i = 0; i < ROOM_NUMBER; i++) {
+                    Map<String, String> roomInfo = new HashMap<>();
+                    String roomName = "";
+                    while (line != null && !line.startsWith("*")) {
+                        String[] args = line.split("=", 2);
+                        if (args[0].equals("room_name")) {
+                            roomName = args[1].trim();
+                        } else if (args[0].equals("items")) {
+                            roomInfo.put("items", args[1]);
+                        } else if (args[0].equals("enemy_present")) {
+                            roomInfo.put("enemy_present", args[1]);
+                        }
+                    }
+                    savedGameWorldInfo.put(roomName, roomInfo);
+                    reader.readLine();
+                }
+                SaveData saveData = new SaveData();
+                saveData.setCurrentPlayer(savedPlayer);
+                saveData.setCurrentGameState(currentGameState);
+                saveData.setCurrentWorld(savedGameWorldInfo);
+                return Optional.ofNullable(saveData);
 
             } catch (IOException io) {
                 io.printStackTrace();

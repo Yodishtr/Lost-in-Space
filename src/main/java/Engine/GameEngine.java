@@ -10,6 +10,12 @@ import java.util.stream.Collectors;
 
 public class GameEngine {
 
+    // to use in load game or start new game:
+    /*List<Item> itemsNameList = Arrays.stream(items).map(s -> {
+                                String itemNameTrimmed = s.trim();
+                                return new Item(itemNameTrimmed);
+                            }).toList();*/
+
     private GameState gameState;
     private final Player player;
     private final Map<String, Room> roomsMap;

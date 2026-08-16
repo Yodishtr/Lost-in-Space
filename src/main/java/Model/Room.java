@@ -10,13 +10,16 @@ public class Room {
     private final Map<String, Room> exits;
     private final List<Item> itemList;
     private Optional<Enemy> optionalEnemy;
+    private boolean enemyPresent;
 
-    public Room(String name, String description, Map<String, Room> exits, List<Item> itemList, Optional<Enemy> enemy) {
+    public Room(String name, String description, Map<String, Room> exits, List<Item> itemList, Optional<Enemy> enemy,
+                boolean enemyPresent) {
         this.name = name;
         this.description = description;
         this.exits = new HashMap<>(exits);
         this.itemList = itemList;
         this.optionalEnemy = enemy;
+        this.enemyPresent = enemyPresent;
     }
 
     public Room(String name, String description) {
@@ -32,6 +35,11 @@ public class Room {
         this.exits = new HashMap<>();
         this.itemList = new ArrayList<>();
         this.optionalEnemy = Optional.empty();
+    }
+
+    public Room () {
+        this.exits = new HashMap<>();
+        this.itemList = new ArrayList<>();
     }
 
     // Getters
@@ -53,6 +61,10 @@ public class Room {
 
     public Optional<Enemy> getOptionalEnemy() {
         return optionalEnemy;
+    }
+
+    public boolean getEnemyPresent() {
+        return this.enemyPresent;
     }
 
     // Setters
@@ -100,6 +112,10 @@ public class Room {
         } else {
             this.optionalEnemy = enemy;
         }
+    }
+
+    public void setEnemyPresent(boolean enemyPresent) {
+        this.enemyPresent = enemyPresent;
     }
 
 
