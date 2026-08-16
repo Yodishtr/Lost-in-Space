@@ -9,10 +9,10 @@ import java.util.Map;
 public class SaveData {
     // a dto to record player game data for save files
     private Player currentPlayer;
-    private Map<String, Room> currentWorld;
+    private Map<String, Map<String, String>> currentWorld;
     private GameState currentGameState;
 
-    public SaveData(Player currentPlayer, Map<String, Room> currentWorld, GameState currentGameState) {
+    public SaveData(Player currentPlayer, Map<String, Map<String, String>> currentWorld, GameState currentGameState) {
         this.currentPlayer = currentPlayer;
         this.currentWorld = currentWorld;
         this.currentGameState = currentGameState;
@@ -25,7 +25,7 @@ public class SaveData {
         return currentPlayer;
     }
 
-    public Map<String, Room> getCurrentWorld() {
+    public Map<String, Map<String, String>> getCurrentWorld() {
         return currentWorld;
     }
 
@@ -38,7 +38,7 @@ public class SaveData {
         this.currentPlayer = currentPlayer;
     }
 
-    public void setCurrentWorld(Map<String, Room> currentWorld) {
+    public void setCurrentWorld(Map<String, Map<String, String>> currentWorld) {
         this.currentWorld = currentWorld;
     }
 

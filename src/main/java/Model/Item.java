@@ -17,6 +17,10 @@ public class Item {
         this.requiredToWin = requiredToWin;
     }
 
+    public Item (String name) {
+        this.name = name;
+    }
+
     // Getters
     public String getName() {
         return name;

@@ -30,6 +30,8 @@ public class Player {
         this.enemiesToKillToWin = enemiesToKillToWin;
     }
 
+    public Player() {}
+
     // Getters
     public Room getCurrentRoom() {
         return currentRoom;

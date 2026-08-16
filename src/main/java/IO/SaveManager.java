@@ -6,6 +6,7 @@ import Model.Player;
 import Model.Room;
 import dto.SaveData;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,35 +14,107 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class SaveManager {
 
     public static Integer save(SaveData saveData) {
         Map<String, String> playerSaveInfo = savePlayer(saveData.getCurrentPlayer());
         String gameStateSaveInfo = saveGameState(saveData.getCurrentGameState());
-        Map<String, Map<String, String>> worldSaveInfo = saveWorld(saveData.getCurrentWorld());
+        Map<String, Map<String, String>> worldSaveInfo = saveData.getCurrentWorld();
 
         // build the path for the save file and the directory to house it
         Path currentPath = resolveFilePath();
+        String sectionSeparator = "*******************************************************";
         try {
             Files.createDirectories(currentPath.getParent());
             try (BufferedWriter writer = Files.newBufferedWriter(currentPath, StandardCharsets.UTF_8)) {
                 // player save
                 for (String key : playerSaveInfo.keySet()) {
                     StringBuilder sb = new StringBuilder();
-                    sb.append(key).append("=").append(playerSaveInfo.get(key)).append("\n)");
+                    sb.append(key).append("=").append(playerSaveInfo.get(key)).append(System.lineSeparator());
                     writer.write(sb.toString());
                 }
+                // section separator
+                writer.write(sectionSeparator);
+                writer.newLine();
+
                 // current game state
                 StringBuilder gameStateSaveInfoBuilder = new StringBuilder();
-                gameStateSaveInfoBuilder.append("game_state=").append(gameStateSaveInfo).append("\n");
+                gameStateSaveInfoBuilder.append("game_state=").append(gameStateSaveInfo).append(System.lineSeparator());
                 writer.write(gameStateSaveInfoBuilder.toString());
 
-                // world save info
+                // Section separator
+                writer.write(sectionSeparator);
+                writer.newLine();
 
+                // world save info
+                for (String roomName : worldSaveInfo.keySet()) {
+                    // need to make the necessary changes for this
+                    writer.write(roomName);
+                    writer.write(System.lineSeparator());
+                    for (String roomInfo : worldSaveInfo.get(roomName).keySet()) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(roomInfo).append("=").append(worldSaveInfo.get(roomName).get(roomInfo))
+                                .append(System.lineSeparator());
+                        writer.write(sb.toString());
+                    }
+                }
+                return 1;
             }
         } catch (IOException io) {
             io.printStackTrace();
+            return 0;
+        }
+    }
+
+    public Optional<SaveData> load () {
+        Path currentPath = resolveFilePath();
+        if (!Files.exists(currentPath)) {
+            return Optional.empty();
+        } else {
+            try (BufferedReader reader = Files.newBufferedReader(currentPath, StandardCharsets.UTF_8)) {
+                Player savedPlayer = new Player();
+                String line;
+                while ((line = reader.readLine()) != null && !line.startsWith("*")) {
+                    String[] args = line.split("=", 2);
+                    if (args[0].equals("name")) {
+                        savedPlayer.setName(args[1]);
+                    }
+                    else if (args[0].equals("health")) {
+                        savedPlayer.setHealth(Integer.parseInt(args[1]));
+                    }
+                    else if (args[0].equals("current_room")) {
+                        savedPlayer.setCurrentRoom(new Room(args[1]));
+                    }
+                    else if (args[0].equals("inventory")) {
+                        String[] items = args[1].split(",");
+                        for (String item : items) {
+                            savedPlayer.addItemToInventory(new Item(item.trim()));
+                        }
+                    }
+                    else if (args[0].equals("items_to_win")) {
+                        savedPlayer.setNumberOfItemsRequiredToWin(Integer.parseInt(args[1]));
+                    }
+                    else if (args[0].equals("enemies_defeated")) {
+                        savedPlayer.setEnemiesToKillToWin(Integer.parseInt(args[1]));
+                    }
+                }
+                reader.readLine();
+                line = reader.readLine();
+                String[] gameStateSaveInfo = line.split("=", 2);
+                GameState currentGameState = GameState.valueOf(gameStateSaveInfo[0]);
+                reader.readLine();
+
+                while (line != null && !line.startsWith("*")) {
+
+                }
+                Map<String, Map<String, String>> savedGameWorldInfo = new HashMap<>();
+
+            } catch (IOException io) {
+                io.printStackTrace();
+                return Optional.empty();
+            }
         }
     }
 
@@ -82,6 +155,8 @@ public class SaveManager {
         return gameState.getState();
     }
 
+
+    // this method needs to be added to gameEngine instead.
     private static Map<String, Map<String, String>> saveWorld(Map<String, Room> currentWorld) {
         Map<String, Map<String, String>> currentWorldInfo = new HashMap<>();
         for (Map.Entry<String, Room> entry : currentWorld.entrySet()) {
