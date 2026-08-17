@@ -95,13 +95,9 @@ public class GameEngineTest {
     @Test
     @DisplayName("Constructor should initialize the instance attribute fields correctly")
     void testConstructor() {
-        GameEngine testGameEngine = new GameEngine(GameState.INTRO, "fakePlayer");
+        GameEngine testGameEngine = new GameEngine(GameState.INTRO);
         assertAll("fields correctly initialized",
-                () -> assertEquals(GameState.INTRO, testGameEngine.getGameState()),
-                () -> assertEquals("fakePlayer", testGameEngine.getPlayer().getName()),
-                () -> assertEquals(5, testGameEngine.getRoomMap().size()),
-                () -> assertTrue(testGameEngine.hasCommandParser())
-                );
+                () -> assertEquals(GameState.INTRO, testGameEngine.getGameState()));
     }
 
     @Test

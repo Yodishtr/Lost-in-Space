@@ -1,8 +1,10 @@
 package Engine;
 
+import IO.SaveManager;
 import Model.*;
 import Model.Command.CommandType;
 import dto.CommandResult;
+import dto.SaveData;
 import utilities.StoriesBuilder;
 
 import java.util.*;
@@ -10,23 +12,19 @@ import java.util.stream.Collectors;
 
 public class GameEngine {
 
-    // to use in load game or start new game:
-    /*List<Item> itemsNameList = Arrays.stream(items).map(s -> {
-                                String itemNameTrimmed = s.trim();
-                                return new Item(itemNameTrimmed);
-                            }).toList();*/
-
     private GameState gameState;
-    private final Player player;
-    private final Map<String, Room> roomsMap;
-    private final CommandParser commandParser;
+    private Player player;
+    private Map<String, Room> roomsMap;
+    private CommandParser commandParser;
 
-    public GameEngine(GameState gameState, String playerName) {
-        this.commandParser = new CommandParser();
+    public GameEngine(GameState gameState) {
         this.gameState = gameState;
+    }
+
+    // this constructor should be used to instantiate the game engine object
+    public GameEngine() {
+        this.commandParser = new CommandParser();
         this.roomsMap = WorldBuilder.buildWorld();
-        this.player = new Player(roomsMap.get("Airlock"), 100, playerName, 2,
-                2);
     }
 
     public GameEngine(GameState gameState, Player player) {
@@ -36,8 +34,8 @@ public class GameEngine {
         this.player = player;
     }
 
-    public CommandResult processCommand(String commandInput) {
-        Command command = commandParser.parseCommand(commandInput);
+    public CommandResult startNewGame(String playerName) {
+        this.player = new Player(roomsMap.get("Airlock"), 100, playerName, 2, 2);
         if (gameState == GameState.INTRO) {
             Map<String, String> introMap = StoriesBuilder.getIntro("storylines.txt");
             List<String> introLines = new ArrayList<>();
@@ -47,8 +45,57 @@ public class GameEngine {
             }
             gameState = GameState.PLAYING;
             return new CommandResult(introLines, true, false,
-                    "/images/airlock.png", "image");
-        } else if (gameState == GameState.PLAYING) {
+                    "/images/airlock.png", "Image");
+        } else {
+            return new CommandResult(Arrays.asList(
+                    "Game state incorrect. It should be Playing.".split("\\p{Punct}")),
+                    false, false, "/images/airlock.png", "Image");
+        }
+    }
+
+    public CommandResult loadGame() {
+        Optional<SaveData> potentialSaveData = SaveManager.load();
+        if (potentialSaveData.isEmpty()) {
+            return new CommandResult(Arrays.asList("No save file found. Please start new game."
+                    .split("\\p{Punct}")), false, false, "", "");
+        } else {
+            Player savedPlayer = potentialSaveData.get().getCurrentPlayer();
+            GameState savedGameState = potentialSaveData.get().getCurrentGameState();
+            Map<String, Map<String, String>> savedWorldInfo = potentialSaveData.get().getCurrentWorld();
+
+            // re-establishing the player info, game state, and world map
+            this.player = savedPlayer;
+            this.gameState = savedGameState;
+            for (Map.Entry<String, Map<String, String>> entry : savedWorldInfo.entrySet()) {
+                String roomName = entry.getKey();
+                Map<String, String> savedRoomInfo = entry.getValue();
+                Room currentRoom = roomsMap.get(roomName);
+                for (Map.Entry<String, String> secondEntry : savedRoomInfo.entrySet()) {
+                    if (secondEntry.getKey().equals("items")) {
+                        List<Item> roomItems = Arrays.stream(secondEntry.getValue().split(","))
+                                .map(s -> {
+                                    String itemName = s.trim();
+                                    return new Item(itemName);
+                                }).toList();
+                        currentRoom.setItemList(roomItems);
+                    } else if (secondEntry.getKey().equals("enemy_present")) {
+                        boolean isEnemyPresent = Boolean.parseBoolean(secondEntry.getValue());
+                        if (!isEnemyPresent) {
+                            currentRoom.setEnemyPresent(isEnemyPresent);
+                            currentRoom.setOptionalEnemy(Optional.empty());
+                        }
+                    }
+                }
+            }
+            return new CommandResult(Arrays.asList("Saved game successfully loaded.".split("\\p{Punct}")),
+                    true, false, getRoomImageAssetName(player.getCurrentRoom().getName()),
+                    "image");
+        }
+    }
+
+    public CommandResult processCommand(String commandInput) {
+        Command command = commandParser.parseCommand(commandInput);
+        if (gameState == GameState.PLAYING) {
             CommandType verbCommand = command.getVerb();
             switch (verbCommand) {
                 case CommandType.GO:
@@ -62,7 +109,6 @@ public class GameEngine {
                 case CommandType.INVENTORY:
                     return handleInventory(command);
                 case CommandType.SAVE:
-                    // helper needs to be implemented once save manager is done
                     return handleSave();
                 case CommandType.UNKNOWN:
                     return handleUnknown();
@@ -325,14 +371,39 @@ public class GameEngine {
         return inventoryMessage.toString();
     }
 
+
+    private Map<String, Map<String, String>> saveWorld(Map<String, Room> currentWorld) {
+        Map<String, Map<String, String>> currentWorldInfo = new HashMap<>();
+        for (Map.Entry<String, Room> entry : currentWorld.entrySet()) {
+            String roomName = entry.getKey();
+            Room currentRoom = entry.getValue();
+            Map<String, String> currentRoomInfo = new HashMap<>();
+            StringBuilder itemList = new StringBuilder();
+            for (Item itemInRoom : currentRoom.getItemList()){
+                itemList.append(itemInRoom.getName()).append(", ");
+            }
+            currentRoomInfo.put("items", itemList.toString());
+            currentRoomInfo.put("enemy_present", String.valueOf(currentRoom.getOptionalEnemy().isPresent()));
+            currentWorldInfo.put(roomName, currentRoomInfo);
+        }
+        return currentWorldInfo;
+    }
+
     public CommandResult handleSave() {
-        System.out.println("To Implement: player" + player.getName() + " wants game progress to be saved");
-        String saved = "Game not saved because save manager not implemented yet";
-        String[] commandMessage = saved.split("\\p{Punct}");
-        Room playerCurrentRoom = player.getCurrentRoom();
-        String roomImageAssetName = getRoomImageAssetName(playerCurrentRoom.getName());
-        return new CommandResult(Arrays.asList(commandMessage), false, false,
-                roomImageAssetName, "Image");
+        SaveData saveData = new SaveData();
+        saveData.setCurrentPlayer(player);
+        saveData.setCurrentGameState(gameState);
+        saveData.setCurrentWorld(saveWorld(roomsMap));
+        int saveSuccess = SaveManager.save(saveData);
+        if (saveSuccess == 1) {
+            return new CommandResult(Arrays.asList("Game Saved SuccessFully!\n".split("\\n")),
+                    false, false, getRoomImageAssetName(player.getCurrentRoom().getName()),
+                    "image");
+        } else {
+            return new CommandResult(Arrays.asList("Game could not be saved!\n".split("\\n")),
+                    false, false, getRoomImageAssetName(player.getCurrentRoom().getName()),
+                    "image");
+        }
     }
 
     public CommandResult handleUnknown() {

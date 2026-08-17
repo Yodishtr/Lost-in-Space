@@ -71,7 +71,7 @@ public class SaveManager {
         }
     }
 
-    public Optional<SaveData> load () {
+    public static Optional<SaveData> load () {
         Path currentPath = resolveFilePath();
         if (!Files.exists(currentPath)) {
             return Optional.empty();
@@ -178,20 +178,5 @@ public class SaveManager {
 
 
     // this method needs to be added to gameEngine instead.
-    private static Map<String, Map<String, String>> saveWorld(Map<String, Room> currentWorld) {
-        Map<String, Map<String, String>> currentWorldInfo = new HashMap<>();
-        for (Map.Entry<String, Room> entry : currentWorld.entrySet()) {
-            String roomName = entry.getKey();
-            Room currentRoom = entry.getValue();
-            Map<String, String> currentRoomInfo = new HashMap<>();
-            StringBuilder itemList = new StringBuilder();
-            for (Item itemInRoom : currentRoom.getItemList()){
-                itemList.append(itemInRoom.getName()).append(", ");
-            }
-            currentRoomInfo.put("items", itemList.toString());
-            currentRoomInfo.put("enemy_present", String.valueOf(currentRoom.getOptionalEnemy().isPresent()));
-            currentWorldInfo.put(roomName, currentRoomInfo);
-        }
-        return currentWorldInfo;
-    }
+
 }
