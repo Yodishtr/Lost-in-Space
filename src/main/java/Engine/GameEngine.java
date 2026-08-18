@@ -54,6 +54,9 @@ public class GameEngine {
     }
 
     public CommandResult loadGame() {
+        /* REMINDER: use the item name to then get its attributes from the world builder because currently
+        * it only has the item name
+        * */
         Optional<SaveData> potentialSaveData = SaveManager.load();
         if (potentialSaveData.isEmpty()) {
             return new CommandResult(Arrays.asList("No save file found. Please start new game."

@@ -19,12 +19,17 @@ public class SaveManager {
     private final static Integer ROOM_NUMBER = 5;
 
     public static Integer save(SaveData saveData) {
+        Path currentPath = resolveFilePath();
+        return save(saveData, currentPath);
+
+    }
+
+    // moved the logic here for better testing
+    public static Integer save(SaveData saveData, Path currentPath) {
         Map<String, String> playerSaveInfo = savePlayer(saveData.getCurrentPlayer());
         String gameStateSaveInfo = saveGameState(saveData.getCurrentGameState());
         Map<String, Map<String, String>> worldSaveInfo = saveData.getCurrentWorld();
 
-        // build the path for the save file and the directory to house it
-        Path currentPath = resolveFilePath();
         String sectionSeparator = "*******************************************************";
         try {
             Files.createDirectories(currentPath.getParent());
@@ -52,7 +57,7 @@ public class SaveManager {
                 for (String roomName : worldSaveInfo.keySet()) {
                     // need to make the necessary changes for this
                     StringBuilder roomNameBuilder = new StringBuilder();
-                    roomNameBuilder.append("room_name").append(roomName).append(System.lineSeparator());
+                    roomNameBuilder.append("room_name=").append(roomName).append(System.lineSeparator());
                     writer.write(roomNameBuilder.toString());
                     for (String roomInfo : worldSaveInfo.get(roomName).keySet()) {
                         StringBuilder sb = new StringBuilder();
@@ -73,6 +78,11 @@ public class SaveManager {
 
     public static Optional<SaveData> load () {
         Path currentPath = resolveFilePath();
+        return load(currentPath);
+
+    }
+
+    public static Optional<SaveData> load(Path currentPath) {
         if (!Files.exists(currentPath)) {
             return Optional.empty();
         } else {
@@ -92,6 +102,7 @@ public class SaveManager {
                     }
                     else if (args[0].equals("inventory")) {
                         String[] items = args[1].split(",");
+                        // need to remove the empty string after splitting
                         for (String item : items) {
                             savedPlayer.addItemToInventory(new Item(item.trim()));
                         }
@@ -103,17 +114,17 @@ public class SaveManager {
                         savedPlayer.setEnemiesToKillToWin(Integer.parseInt(args[1]));
                     }
                 }
-                reader.readLine();
                 line = reader.readLine();
                 String[] gameStateSaveInfo = line.split("=", 2);
-                GameState currentGameState = GameState.valueOf(gameStateSaveInfo[0]);
-                reader.readLine();
+                GameState currentGameState = GameState.valueOf(gameStateSaveInfo[1].toUpperCase());
+                line = reader.readLine();
 
+                //missing the = between room_name and actual room name
                 Map<String, Map<String, String>> savedGameWorldInfo = new HashMap<>();
                 for (int i = 0; i < ROOM_NUMBER; i++) {
                     Map<String, String> roomInfo = new HashMap<>();
                     String roomName = "";
-                    while (line != null && !line.startsWith("*")) {
+                    while (((line = reader.readLine()) != null) && !line.startsWith("*")) {
                         String[] args = line.split("=", 2);
                         if (args[0].equals("room_name")) {
                             roomName = args[1].trim();
@@ -124,7 +135,7 @@ public class SaveManager {
                         }
                     }
                     savedGameWorldInfo.put(roomName, roomInfo);
-                    reader.readLine();
+                    line = reader.readLine();
                 }
                 SaveData saveData = new SaveData();
                 saveData.setCurrentPlayer(savedPlayer);
@@ -175,8 +186,5 @@ public class SaveManager {
     private static String saveGameState(GameState gameState) {
         return gameState.getState();
     }
-
-
-    // this method needs to be added to gameEngine instead.
 
 }
