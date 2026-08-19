@@ -73,9 +73,11 @@ public class SaveManagerTest {
                 () -> assertTrue(potentialSaveData.get().getCurrentGameState() == GameState.PLAYING,
                         "game state is not PLAYING"),
                 () -> assertTrue(potentialSaveData.get().getCurrentWorld().containsKey("Ranch"),
-                        "cannot retrieve the item from room"),
+                        "cannot retrieve the item Ranch from room"),
                 () -> assertEquals("Ranch", potentialSaveData.get().getCurrentWorld().
-                        get("Ranch").get("items"), "cannot find items from room")
+                        get("Ranch").get("items"), "cannot find items from room"),
+                () -> assertTrue(potentialSaveData.get().getCurrentWorld().containsKey("Airlock"),
+                        "cannot find airlock room")
                 );
     }
 }

@@ -16,7 +16,7 @@ import java.util.*;
 
 public class SaveManager {
 
-    private final static Integer ROOM_NUMBER = 5;
+    private final static Integer ROOM_NUMBER = 2;
 
     public static Integer save(SaveData saveData) {
         Path currentPath = resolveFilePath();
@@ -68,6 +68,8 @@ public class SaveManager {
                     writer.write(sectionSeparator);
                     writer.newLine();
                 }
+
+                System.out.println(currentPath.toAbsolutePath().toString());
                 return 1;
             }
         } catch (IOException io) {
@@ -104,14 +106,16 @@ public class SaveManager {
                         String[] items = args[1].split(",");
                         // need to remove the empty string after splitting
                         for (String item : items) {
-                            savedPlayer.addItemToInventory(new Item(item.trim()));
+                            if (!item.isBlank()) {
+                                savedPlayer.addItemToInventory(new Item(item.trim()));
+                            }
                         }
                     }
                     else if (args[0].equals("items_to_win")) {
                         savedPlayer.setNumberOfItemsRequiredToWin(Integer.parseInt(args[1]));
                     }
                     else if (args[0].equals("enemies_defeated")) {
-                        savedPlayer.setEnemiesToKillToWin(Integer.parseInt(args[1]));
+                        savedPlayer.setEnemiesDefeated(Integer.parseInt(args[1]));
                     }
                 }
                 line = reader.readLine();
@@ -124,7 +128,10 @@ public class SaveManager {
                 for (int i = 0; i < ROOM_NUMBER; i++) {
                     Map<String, String> roomInfo = new HashMap<>();
                     String roomName = "";
-                    while (((line = reader.readLine()) != null) && !line.startsWith("*")) {
+                    while (((line = reader.readLine()) != null)) {
+                        if (line.startsWith("*")){
+                            break;
+                        }
                         String[] args = line.split("=", 2);
                         if (args[0].equals("room_name")) {
                             roomName = args[1].trim();
@@ -135,7 +142,6 @@ public class SaveManager {
                         }
                     }
                     savedGameWorldInfo.put(roomName, roomInfo);
-                    line = reader.readLine();
                 }
                 SaveData saveData = new SaveData();
                 saveData.setCurrentPlayer(savedPlayer);

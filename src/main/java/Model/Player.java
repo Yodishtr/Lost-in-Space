@@ -91,6 +91,10 @@ public class Player {
         this.inventory.remove(item.getName());
     }
 
+    public void setEnemiesDefeated(Integer enemiesDefeated) {
+        this.enemiesDefeated = enemiesDefeated;
+    }
+
     public void addEnemyDefeated() {
         this.enemiesDefeated++;
     }
