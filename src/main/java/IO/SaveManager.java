@@ -16,7 +16,7 @@ import java.util.*;
 
 public class SaveManager {
 
-    private final static Integer ROOM_NUMBER = 2;
+    private final static Integer ROOM_NUMBER = 5;
 
     public static Integer save(SaveData saveData) {
         Path currentPath = resolveFilePath();

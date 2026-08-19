@@ -7,6 +7,7 @@ import dto.CommandResult;
 import dto.SaveData;
 import utilities.StoriesBuilder;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,11 +54,9 @@ public class GameEngine {
         }
     }
 
-    public CommandResult loadGame() {
-        /* REMINDER: use the item name to then get its attributes from the world builder because currently
-        * it only has the item name
-        * */
-        Optional<SaveData> potentialSaveData = SaveManager.load();
+    public CommandResult loadGame(Path currentPath) {
+
+        Optional<SaveData> potentialSaveData = SaveManager.load(currentPath);
         if (potentialSaveData.isEmpty()) {
             return new CommandResult(Arrays.asList("No save file found. Please start new game."
                     .split("\\p{Punct}")), false, false, "", "");

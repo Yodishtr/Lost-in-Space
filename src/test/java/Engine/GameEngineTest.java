@@ -1,14 +1,18 @@
 package Engine;
 
+import IO.SaveManager;
 import Model.*;
 import dto.CommandResult;
+import dto.SaveData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -734,6 +738,24 @@ public class GameEngineTest {
                             commandResult.getDisplayMessage().getFirst())
             );
         }
+    }
+
+
+    @Nested
+    @DisplayName("test the load game method")
+    class LoadGameMethod {
+
+        @Test
+        @DisplayName("test the world loads correctly")
+        void testWorldLoadsCorrectly() {
+            Path testPath = Path.of("/tmp/Lost-In-Space-Test/save.txt");
+            /* have current player of this test suite, move into armory, grab an item
+            * create a save data dto of the current world. save it using SaveManager.save
+            * using the test path. then do fakeGameEnginePlaying.load(testPath) and
+            * assert the world has been correctly re-created.
+            * */
+        }
+
     }
 
 
