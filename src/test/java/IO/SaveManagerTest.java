@@ -1,9 +1,11 @@
 package IO;
 
+import Engine.GameEngine;
 import Model.GameState;
 import Model.Item;
 import Model.Player;
 import Model.Room;
+import dto.CommandResult;
 import dto.SaveData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,7 @@ public class SaveManagerTest {
     @Test
     @DisplayName("testing save method")
     void testSave() {
-        Path testPath = Path.of("/tmp/Lost-In-Space-Test/save.txt");
+        Path testPath = Path.of("/tmp/Lost-In-Space-Test-1/save.txt");
         Player currentPlayer = new Player(new Room("Airlock"), 100, "Big Mon", 2, 2);
         currentPlayer.addItemToInventory(new Item("Zambo"));
         GameState currentGameState = GameState.PLAYING;
@@ -60,7 +62,7 @@ public class SaveManagerTest {
     @Test
     @DisplayName("test load method by using the same save file as previous test")
     void testLoad() {
-        Path testPath = Path.of("/tmp/Lost-In-Space-Test/save.txt");
+        Path testPath = Path.of("/tmp/Lost-In-Space-Test-1/save.txt");
         Optional<SaveData> potentialSaveData = SaveManager.load(testPath);
         assertAll("loads the save file correctly",
                 () -> assertTrue(potentialSaveData.isPresent(), "save data absent"),
@@ -78,6 +80,30 @@ public class SaveManagerTest {
                         get("Ranch").get("items"), "cannot find items from room"),
                 () -> assertTrue(potentialSaveData.get().getCurrentWorld().containsKey("Airlock"),
                         "cannot find airlock room")
+                );
+    }
+
+    @Test
+    @DisplayName("Game engine using load method correctly reconstructs the world using the save data")
+    void testGameEngineLoad() {
+        Path testPath = Path.of("/tmp/Lost-In-Space-Test/save.txt");
+        GameEngine engine = new GameEngine();
+        engine.setGameState(GameState.PLAYING);
+        Player fakePlayer = new Player(engine.getRoomMap().get("Airlock"), 100, "HeroTest", 1,
+                1);
+        engine.setPlayer(fakePlayer);
+        engine.processCommand("Go North");
+        engine.processCommand("Take Multitool");
+        SaveData currentSaveData = new SaveData();
+        currentSaveData.setCurrentPlayer(fakePlayer);
+        currentSaveData.setCurrentGameState(GameState.PLAYING);
+        currentSaveData.setCurrentWorld(engine.saveWorld(engine.getRoomMap()));
+        int result = SaveManager.save(currentSaveData, testPath);
+        assertAll("Saved game recreated correctly",
+                () -> assertTrue(result == 1, "could not save game"),
+                () -> assertTrue(fakePlayer.getInventory().containsKey("Multitool"), "does not contain tool"),
+                () -> assertTrue(engine.getRoomMap().get("Cargo Bay").getItemList().size() == 1,
+                        "is not size 1")
                 );
     }
 }

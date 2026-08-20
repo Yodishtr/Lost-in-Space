@@ -741,22 +741,4 @@ public class GameEngineTest {
     }
 
 
-    @Nested
-    @DisplayName("test the load game method")
-    class LoadGameMethod {
-
-        @Test
-        @DisplayName("test the world loads correctly")
-        void testWorldLoadsCorrectly() {
-            Path testPath = Path.of("/tmp/Lost-In-Space-Test/save.txt");
-            /* have current player of this test suite, move into armory, grab an item
-            * create a save data dto of the current world. save it using SaveManager.save
-            * using the test path. then do fakeGameEnginePlaying.load(testPath) and
-            * assert the world has been correctly re-created.
-            * */
-        }
-
-    }
-
-
 }

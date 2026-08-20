@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 public class GameEngine {
 
     private GameState gameState;
@@ -70,28 +71,36 @@ public class GameEngine {
             this.gameState = savedGameState;
             for (Map.Entry<String, Map<String, String>> entry : savedWorldInfo.entrySet()) {
                 String roomName = entry.getKey();
+                List<Item> currentItem = new ArrayList<>();
+                boolean isEnemyPresent = false;
                 Map<String, String> savedRoomInfo = entry.getValue();
-                Room currentRoom = roomsMap.get(roomName);
                 for (Map.Entry<String, String> secondEntry : savedRoomInfo.entrySet()) {
                     if (secondEntry.getKey().equals("items")) {
-                        List<Item> roomItems = Arrays.stream(secondEntry.getValue().split(","))
-                                .map(s -> {
-                                    String itemName = s.trim();
-                                    return new Item(itemName);
-                                }).toList();
-                        currentRoom.setItemList(roomItems);
-                    } else if (secondEntry.getKey().equals("enemy_present")) {
-                        boolean isEnemyPresent = Boolean.parseBoolean(secondEntry.getValue());
-                        if (!isEnemyPresent) {
-                            currentRoom.setEnemyPresent(isEnemyPresent);
-                            currentRoom.setOptionalEnemy(Optional.empty());
+                        String[] splitString = secondEntry.getValue().split(",");
+                        for (String s : splitString) {
+                            if (!s.isBlank()) {
+                                currentItem.add(new Item(s.trim()));
+                            }
                         }
+                    } else if (secondEntry.getKey().equals("enemy_present")) {
+                        isEnemyPresent = Boolean.parseBoolean(secondEntry.getValue());
                     }
                 }
+                recreateRoom(roomName, currentItem, isEnemyPresent);
             }
             return new CommandResult(Arrays.asList("Saved game successfully loaded.".split("\\p{Punct}")),
                     true, false, getRoomImageAssetName(player.getCurrentRoom().getName()),
                     "image");
+        }
+    }
+
+    private void recreateRoom(String roomName, List<Item> itemStillPresent, boolean isEnemyPresent) {
+        Room realRoom = roomsMap.get(roomName);
+        Set<String> stillPresentSet = itemStillPresent.stream().map(s -> s.getName()).collect(Collectors.toSet());
+        realRoom.getItemList().removeIf(item -> !stillPresentSet.contains(item.getName()));
+        if (realRoom.getEnemyPresent() && !isEnemyPresent) {
+            realRoom.setEnemyPresent(false);
+            realRoom.setOptionalEnemy(Optional.empty());
         }
     }
 
@@ -374,7 +383,7 @@ public class GameEngine {
     }
 
 
-    private Map<String, Map<String, String>> saveWorld(Map<String, Room> currentWorld) {
+    public Map<String, Map<String, String>> saveWorld(Map<String, Room> currentWorld) {
         Map<String, Map<String, String>> currentWorldInfo = new HashMap<>();
         for (Map.Entry<String, Room> entry : currentWorld.entrySet()) {
             String roomName = entry.getKey();
@@ -443,11 +452,19 @@ public class GameEngine {
         return player;
     }
 
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
     public Map<String, Room> getRoomMap() {
         return roomsMap;
     }
 
     public GameState getGameState() {
         return gameState;
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 }
