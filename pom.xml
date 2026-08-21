@@ -32,6 +32,13 @@
             <version>21</version>
         </dependency>
 
+        <!-- JavaFx graphics  -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>21</version>
+        </dependency>
+
         <!-- the javafx dependency for the fxml to have control over the layout -->
         <dependency>
             <groupId>org.openjfx</groupId>

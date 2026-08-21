@@ -99,6 +99,7 @@ public class SaveManagerTest {
         currentSaveData.setCurrentGameState(GameState.PLAYING);
         currentSaveData.setCurrentWorld(engine.saveWorld(engine.getRoomMap()));
         int result = SaveManager.save(currentSaveData, testPath);
+        engine.loadGame(testPath);
         assertAll("Saved game recreated correctly",
                 () -> assertTrue(result == 1, "could not save game"),
                 () -> assertTrue(fakePlayer.getInventory().containsKey("Multitool"), "does not contain tool"),
