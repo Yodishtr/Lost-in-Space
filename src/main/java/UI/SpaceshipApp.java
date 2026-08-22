@@ -41,8 +41,7 @@ public class SpaceshipApp extends Application {
     }
 
     private void handleLoadGame() {
-        Path savePath = Path.of("save.ser");
-        CommandResult loadGameResult = engine.loadGame(savePath);
+        CommandResult loadGameResult = engine.loadGame();
         showGameWindow(loadGameResult);
     }
 

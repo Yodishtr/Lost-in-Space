@@ -56,8 +56,7 @@ public class GameEngine {
     }
 
     public CommandResult loadGame(Path currentPath) {
-
-        Optional<SaveData> potentialSaveData = SaveManager.load(currentPath);
+        Optional<SaveData> potentialSaveData = SaveManager.load();
         if (potentialSaveData.isEmpty()) {
             return new CommandResult(Arrays.asList("No save file found. Please start new game."
                     .split("\\p{Punct}")), false, false, "", "");
@@ -66,7 +65,7 @@ public class GameEngine {
             GameState savedGameState = potentialSaveData.get().getCurrentGameState();
             Map<String, Map<String, String>> savedWorldInfo = potentialSaveData.get().getCurrentWorld();
 
-            // re-establishing the player info, game state, and world map
+            // need to recreate player
             this.player = savedPlayer;
             this.gameState = savedGameState;
             for (Map.Entry<String, Map<String, String>> entry : savedWorldInfo.entrySet()) {
@@ -88,6 +87,49 @@ public class GameEngine {
                 }
                 recreateRoom(roomName, currentItem, isEnemyPresent);
             }
+            return new CommandResult(Arrays.asList("Saved game successfully loaded.".split("\\p{Punct}")),
+                    true, false, getRoomImageAssetName(player.getCurrentRoom().getName()),
+                    "image");
+        }
+    }
+
+    public CommandResult loadGame() {
+        Optional<SaveData> potentialSaveData = SaveManager.load();
+        if (potentialSaveData.isEmpty()) {
+            return new CommandResult(Arrays.asList("No save file found. Please start new game."
+                    .split("\\p{Punct}")), false, false, "", "");
+        } else {
+            Player savedPlayer = potentialSaveData.get().getCurrentPlayer();
+            GameState savedGameState = potentialSaveData.get().getCurrentGameState();
+            Map<String, Map<String, String>> savedWorldInfo = potentialSaveData.get().getCurrentWorld();
+
+            // need to recreate player
+            this.player = savedPlayer;
+            this.gameState = savedGameState;
+            for (Map.Entry<String, Map<String, String>> entry : savedWorldInfo.entrySet()) {
+                String roomName = entry.getKey();
+                List<Item> currentItem = new ArrayList<>();
+                boolean isEnemyPresent = false;
+                Map<String, String> savedRoomInfo = entry.getValue();
+                for (Map.Entry<String, String> secondEntry : savedRoomInfo.entrySet()) {
+                    if (secondEntry.getKey().equals("items")) {
+                        String[] splitString = secondEntry.getValue().split(",");
+                        for (String s : splitString) {
+                            if (!s.isBlank()) {
+                                currentItem.add(new Item(s.trim()));
+                            }
+                        }
+                    } else if (secondEntry.getKey().equals("enemy_present")) {
+                        isEnemyPresent = Boolean.parseBoolean(secondEntry.getValue());
+                    }
+                }
+                recreateRoom(roomName, currentItem, isEnemyPresent);
+            }
+            this.player.setCurrentRoom(this.roomsMap.get(player.getCurrentRoom().getName()));
+            for (String itemName : this.player.getInventory().keySet()){
+                this.player.getInventory().put(itemName, WorldBuilder.itemLookupMap.get(itemName));
+            }
+
             return new CommandResult(Arrays.asList("Saved game successfully loaded.".split("\\p{Punct}")),
                     true, false, getRoomImageAssetName(player.getCurrentRoom().getName()),
                     "image");

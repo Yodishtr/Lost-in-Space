@@ -156,7 +156,7 @@ public class SaveManager {
         }
     }
 
-    private static Path resolveFilePath() {
+    public static Path resolveFilePath() {
         String currentHomeDir = System.getProperty("user.home");
         String currentOS = System.getProperty("os.name");
         Path path;

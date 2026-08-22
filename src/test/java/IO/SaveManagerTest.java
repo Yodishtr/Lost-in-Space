@@ -108,4 +108,28 @@ public class SaveManagerTest {
                         "is not size 1")
                 );
     }
+
+    @Test
+    @DisplayName("loading issues when running game")
+    void testLoadingIssues() {
+        GameEngine engine = new GameEngine();
+        engine.setGameState(GameState.PLAYING);
+        Player fakePlayer = new Player(engine.getRoomMap().get("Airlock"), 100, "HeroTest", 1,
+                1);
+        engine.setPlayer(fakePlayer);
+        engine.processCommand("Go North");
+        engine.processCommand("Take Multitool");
+        SaveData currentSaveData = new SaveData();
+        currentSaveData.setCurrentPlayer(fakePlayer);
+        currentSaveData.setCurrentGameState(GameState.PLAYING);
+        currentSaveData.setCurrentWorld(engine.saveWorld(engine.getRoomMap()));
+        int result = SaveManager.save(currentSaveData);
+        engine.loadGame();
+        assertAll("Saved game recreated correctly",
+                () -> assertTrue(result == 1, "could not save game"),
+                () -> assertTrue(fakePlayer.getInventory().containsKey("Multitool"), "does not contain tool"),
+                () -> assertTrue(engine.getRoomMap().get("Cargo Bay").getItemList().size() == 1,
+                        "is not size 1")
+        );
+    }
 }

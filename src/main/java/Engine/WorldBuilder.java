@@ -20,6 +20,7 @@ public class WorldBuilder {
     public static final String EAST = "EAST";
     public static final String SOUTH = "SOUTH";
     public static final String WEST = "WEST";
+    public static Map<String, Item> itemLookupMap = new HashMap<>();
     // use the storiesbuilder utility class to fill out the description of each room
 
     public static Map<String, Room> buildWorld() {
@@ -93,6 +94,8 @@ public class WorldBuilder {
                             false);
                     currentRoom.addItem(spareOxygenTank);
                     currentRoom.addItem(multiTool);
+                    itemLookupMap.put(spareOxygenTank.getName(), spareOxygenTank);
+                    itemLookupMap.put(multiTool.getName(), multiTool);
                     break;
                 case ENGINEERING:
                     for (String direction : directions) {
@@ -115,6 +118,8 @@ public class WorldBuilder {
                             "to escape the vessel.", true);
                     currentRoom.addItem(sedativeInjector);
                     currentRoom.addItem(fuelCell);
+                    itemLookupMap.put(sedativeInjector.getName(), sedativeInjector);
+                    itemLookupMap.put(fuelCell.getName(), fuelCell);
                     break;
                 case MEDICAL_BAY:
                     for (String direction : directions) {
