@@ -71,14 +71,7 @@
                 <version>3.2.5</version>
             </plugin>
 
-            <!-- the javafx plugin to enable maven to run it -->
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-            </plugin>
-
-            <!-- JavaFX plugin configuration -->
+            <!-- javafx plugin configuration -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>

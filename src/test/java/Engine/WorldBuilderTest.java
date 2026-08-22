@@ -42,38 +42,38 @@ public class WorldBuilderTest {
         Map<String, Room> medicalBayExits = worldMap.get("Medical Bay").getExits();
 
         assertAll("Airlock Exits",
-                () -> assertEquals("Cargo Bay", airlockExits.get("North").getName()),
-                () -> assertEquals("Medical Bay", airlockExits.get("East").getName()),
-                () -> assertEquals("Armory", airlockExits.get("South").getName()),
-                () -> assertEquals("Engineering", airlockExits.get("West").getName())
+                () -> assertEquals("Cargo Bay", airlockExits.get("NORTH").getName()),
+                () -> assertEquals("Medical Bay", airlockExits.get("EAST").getName()),
+                () -> assertEquals("Armory", airlockExits.get("SOUTH").getName()),
+                () -> assertEquals("Engineering", airlockExits.get("WEST").getName())
         );
 
         assertAll("Armory Exits",
-                () -> assertEquals("Airlock", armoryExits.get("North").getName()),
-                () -> assertEquals("Medical Bay", armoryExits.get("East").getName()),
-                () -> assertThrows(NullPointerException.class, () -> armoryExits.get("South").getName()),
-                () -> assertEquals("Engineering", armoryExits.get("West").getName())
+                () -> assertEquals("Airlock", armoryExits.get("NORTH").getName()),
+                () -> assertEquals("Medical Bay", armoryExits.get("EAST").getName()),
+                () -> assertThrows(NullPointerException.class, () -> armoryExits.get("SOUTH").getName()),
+                () -> assertEquals("Engineering", armoryExits.get("WEST").getName())
         );
 
         assertAll("Cargo Bay Exits",
-                () -> assertThrows(NullPointerException.class, () -> cargoBayExits.get("North").getName()),
-                () -> assertEquals("Medical Bay", cargoBayExits.get("East").getName()),
-                () -> assertEquals("Airlock", cargoBayExits.get("South").getName()),
-                () -> assertEquals("Engineering", cargoBayExits.get("West").getName())
+                () -> assertThrows(NullPointerException.class, () -> cargoBayExits.get("NORTH").getName()),
+                () -> assertEquals("Medical Bay", cargoBayExits.get("EAST").getName()),
+                () -> assertEquals("Airlock", cargoBayExits.get("SOUTH").getName()),
+                () -> assertEquals("Engineering", cargoBayExits.get("WEST").getName())
         );
 
         assertAll("Engineering Bay Exits",
-                () -> assertEquals("Cargo Bay", engineeringExits.get("North").getName()),
-                () -> assertEquals("Airlock", engineeringExits.get("East").getName()),
-                () -> assertEquals("Armory", engineeringExits.get("South").getName()),
-                () -> assertThrows(NullPointerException.class, () -> engineeringExits.get("West").getName())
+                () -> assertEquals("Cargo Bay", engineeringExits.get("NORTH").getName()),
+                () -> assertEquals("Airlock", engineeringExits.get("EAST").getName()),
+                () -> assertEquals("Armory", engineeringExits.get("SOUTH").getName()),
+                () -> assertThrows(NullPointerException.class, () -> engineeringExits.get("WEST").getName())
                 );
 
         assertAll("Medical Bay Exits",
-                () -> assertEquals("Cargo Bay", medicalBayExits.get("North").getName()),
-                () -> assertThrows(NullPointerException.class, () -> medicalBayExits.get("East").getName()),
-                () -> assertEquals("Armory", medicalBayExits.get("South").getName()),
-                () -> assertEquals("Airlock", medicalBayExits.get("West").getName())
+                () -> assertEquals("Cargo Bay", medicalBayExits.get("NORTH").getName()),
+                () -> assertThrows(NullPointerException.class, () -> medicalBayExits.get("EAST").getName()),
+                () -> assertEquals("Armory", medicalBayExits.get("SOUTH").getName()),
+                () -> assertEquals("Airlock", medicalBayExits.get("WEST").getName())
         );
     }
 

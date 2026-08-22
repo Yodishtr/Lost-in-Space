@@ -24,7 +24,8 @@ public class SaveManagerTest {
     @Test
     @DisplayName("test before setting up the mock save.txt")
     void testLoadNoSaveFile() {
-        Optional<SaveData> potentialSaveData = SaveManager.load();
+        Path testPath = Path.of("/tmp/Lost-In-Space-Test-2/save.txt");
+        Optional<SaveData> potentialSaveData = SaveManager.load(testPath);
         assertTrue(potentialSaveData.isEmpty());
     }
 
