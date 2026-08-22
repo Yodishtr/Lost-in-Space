@@ -738,6 +738,24 @@ public class GameEngineTest {
                             commandResult.getDisplayMessage().getFirst())
             );
         }
+
+        @Test
+        @DisplayName("handle inventory method correctly")
+        void testInventoryInput() {
+            fakeGameEnginePlaying.setRoomsMap(fakeWorld);
+            fakeGameEnginePlaying.processCommand("go South");
+            fakeGameEnginePlaying.processCommand("take Tool");
+            CommandResult commandResult = fakeGameEnginePlaying.processCommand("inventory");
+            assertAll("one inventory",
+                    () -> assertFalse(commandResult.isChangeImage(), "image change is not false"),
+                    () -> assertFalse(commandResult.isGameOver(), "game over is not false"),
+                    () -> assertTrue(fakePlayer.getInventory().size() == 1, "inventory is not 1"),
+                    () -> assertEquals(fakePlayer.getName() + " has " + fakePlayer.getInventory().size() +
+                            " items.", commandResult.getDisplayMessage().getFirst()),
+                    () -> assertEquals("cargo_bay", commandResult.getDisplayAssetPath()),
+                    () -> assertEquals("Image", commandResult.getDisplayAssetType())
+            );
+        }
     }
 
 

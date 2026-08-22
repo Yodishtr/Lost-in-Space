@@ -1,0 +1,63 @@
+/* Root Dark Background */
+.root {
+    -fx-background-color: #0b0e14;
+    -fx-font-family: 'Consolas', 'Courier New', monospace;
+}
+
+/* Console Output Text Area */
+.console-output {
+    -fx-control-inner-background: #121824;
+    -fx-text-fill: #00ffcc;
+    -fx-font-size: 14px;
+    -fx-border-color: #1e293b;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.console-output .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+/* Input Text Field */
+.text-field {
+    -fx-background-color: #161e2e;
+    -fx-text-fill: #ffffff;
+    -fx-prompt-text-fill: #64748b;
+    -fx-font-size: 14px;
+    -fx-border-color: #334155;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 8px;
+}
+
+.text-field:focused {
+    -fx-border-color: #00ffcc;
+}
+
+/* Standard Buttons & Quick Actions */
+.button {
+    -fx-background-color: #1e293b;
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-border-color: #475569;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #334155;
+    -fx-text-fill: #00ffcc;
+    -fx-border-color: #00ffcc;
+}
+
+/* Main Title Label on Start Screen */
+.title-label {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00ffcc;
+    -fx-effect: dropshadow(gaussian, #00ffcc, 10, 0.2, 0, 0);
+}

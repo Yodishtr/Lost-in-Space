@@ -9,6 +9,10 @@ public class CommandResult {
     private boolean gameOver;
     private String displayAssetPath;
     private String displayAssetType;
+    private boolean itemPickedUp;
+    private boolean enemyKilled;
+    private boolean enemyAttacked;
+    private boolean usedItem;
 
     public CommandResult(List<String> displayMessage, boolean changeImage, boolean gameOver, String displayAssetPath,
                          String displayAssetType) {
@@ -17,6 +21,19 @@ public class CommandResult {
         this.gameOver = gameOver;
         this.displayAssetPath = displayAssetPath;
         this.displayAssetType = displayAssetType;
+    }
+
+    public CommandResult(List<String> displayMessage, boolean changeImage, boolean gameOver, String displayAssetPath, String displayAssetType,
+                         boolean itemPickedUp, boolean enemyKilled, boolean enemyAttacked, boolean usedItem) {
+        this.displayMessage = displayMessage;
+        this.changeImage = changeImage;
+        this.gameOver = gameOver;
+        this.displayAssetPath = displayAssetPath;
+        this.displayAssetType = displayAssetType;
+        this.itemPickedUp = itemPickedUp;
+        this.enemyKilled = enemyKilled;
+        this.enemyAttacked = enemyAttacked;
+        this.usedItem = usedItem;
     }
 
     // Getters
@@ -40,6 +57,18 @@ public class CommandResult {
         return displayAssetType;
     }
 
+    public boolean isItemPickedUp() {
+        return itemPickedUp;
+    }
+
+    public boolean isEnemyKilled() {
+        return enemyKilled;
+    }
+
+    public boolean isEnemyAttacked() {
+        return enemyAttacked;
+    }
+
     // Setters
     public void setDisplayMessage(List<String> displayMessage) {
         this.displayMessage = displayMessage;
@@ -59,5 +88,17 @@ public class CommandResult {
 
     public void setDisplayAssetType(String displayAssetType) {
         this.displayAssetType = displayAssetType;
+    }
+
+    public void setItemPickedUp(boolean itemPickedUp) {
+        this.itemPickedUp = itemPickedUp;
+    }
+
+    public void setEnemyKilled(boolean enemyKilled) {
+        this.enemyKilled = enemyKilled;
+    }
+
+    public void setEnemyAttacked(boolean enemyAttacked) {
+        this.enemyAttacked = enemyAttacked;
     }
 }

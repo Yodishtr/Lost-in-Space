@@ -42,16 +42,16 @@ public class GameEngine {
             Map<String, String> introMap = StoriesBuilder.getIntro("storylines.txt");
             List<String> introLines = new ArrayList<>();
             for (String line : introMap.values()) {
-                String[] splitLine = line.split(".");
+                String[] splitLine = line.split("\\.");
                 Collections.addAll(introLines, splitLine);
             }
             gameState = GameState.PLAYING;
             return new CommandResult(introLines, true, false,
-                    "/images/airlock.png", "Image");
+                    "airlock", "Image");
         } else {
             return new CommandResult(Arrays.asList(
                     "Game state incorrect. It should be Playing.".split("\\p{Punct}")),
-                    false, false, "/images/airlock.png", "Image");
+                    false, false, "airlock", "Image");
         }
     }
 
@@ -224,7 +224,7 @@ public class GameEngine {
                     "from the room.";
             String[] displayMessageArray = displayNoTargetSpecifiedMessage.split("\\p{Punct}");
             return new CommandResult(Arrays.asList(displayMessageArray), false, false,
-                    roomImageAssetName, "Image");
+                    roomImageAssetName, "Image", false, false, false, false);
         }
         String object = optionalTarget.get().trim().toLowerCase();
         Iterator<Item> itemIterator = playerCurrentRoom.getItemList().iterator();
@@ -236,13 +236,14 @@ public class GameEngine {
                 String foundItemMessage = player.getName() + " took " + item.getName();
                 String[] commandMessage = foundItemMessage.split("\\p{Punct}");
                 return new CommandResult(Arrays.asList(commandMessage), false, false,
-                        roomImageAssetName, "Image");
+                        roomImageAssetName, "Image", true, true,
+                        true, false);
             }
         }
         String noItemfoundMessage = "There are no " + object + " in the room.";
         String[] commandMessage = noItemfoundMessage.split("\\p{Punct}");
         return new CommandResult(Arrays.asList(commandMessage), false, false,
-                roomImageAssetName, "Image");
+                roomImageAssetName, "Image", false, false, false, false);
     }
 
     public CommandResult handleUse(Command command) {
@@ -253,7 +254,8 @@ public class GameEngine {
             String noItemsToUse = player.getName() + " did not specify an object to use from his inventory.";
             String[] commandMessage = noItemsToUse.split("\\p{Punct}");
             return new CommandResult(Arrays.asList(commandMessage), false, false,
-                    roomImageAssetName, "Image");
+                    roomImageAssetName, "Image", false, false,
+                    false, false);
         }
         String object = optionalTarget.get();
 
@@ -271,19 +273,22 @@ public class GameEngine {
                         "items and have not eliminated the threats yet.";
                 String[] commandMessage = cantLeaveYetMessage.split("\\n");
                 return new CommandResult(Arrays.asList(commandMessage), false, false,
-                        roomImageAssetName, "Image");
+                        roomImageAssetName, "Image", false, false,
+                        false, false);
             } else if (!numberWinCondition && playerCurrentRoom.getName().equals("Airlock")) {
                 String notEnoughItemMessage = player.getName() + " needs to collect the necessary items then " +
                         "head to the Airlock.";
                 String[] commandMessage = notEnoughItemMessage.split("\\p{Punct}");
                 return new CommandResult(Arrays.asList(commandMessage), false, false,
-                        roomImageAssetName, "Image");
+                        roomImageAssetName, "Image", false, false,
+                        false, false);
             } else if (numberWinCondition && !playerCurrentRoom.getName().equals("Airlock")) {
                 String notInTheRightRoom = player.getName() + " is not in the right room.\nThe escape pod can only be " +
                         "accessed by the Airlock.";
                 String[] commandMessage = notInTheRightRoom.split("\\n");
                 return new CommandResult(Arrays.asList(commandMessage), false, false,
-                        roomImageAssetName, "Image");
+                        roomImageAssetName, "Image", false, false,
+                        false, false);
             } else {
                 return gameOutcome(GameState.WON);
             }
@@ -299,7 +304,8 @@ public class GameEngine {
             String notInInventory = object + " is not in the inventory.\n";
             String[] commandMessage = notInInventory.split("\\n");
             return new CommandResult(Arrays.asList(commandMessage), false, false,
-                    roomImageAssetName, "Image");
+                    roomImageAssetName, "Image", false, false,
+                    false, false);
         } else {
             if (playerCurrentRoom.getOptionalEnemy().isPresent()) {
                 Enemy enemyInTheRoom = playerCurrentRoom.getOptionalEnemy().get();
@@ -309,7 +315,8 @@ public class GameEngine {
                     player.addEnemyDefeated();
                     String[] successMessage = enemyInTheRoom.getSuccessMessage().split("\\p{Punct}");
                     return new CommandResult(Arrays.asList(successMessage), false, false,
-                            roomImageAssetName, "Image");
+                            roomImageAssetName, "Image", false, true,
+                            false, true);
                 } else {
                     String[] failureMessage = enemyInTheRoom.getFailureMessage().split("\\p{Punct}");
                     player.setHealth(player.getHealth() - 50);
@@ -317,13 +324,15 @@ public class GameEngine {
                         return gameOutcome(GameState.LOST);
                     }
                     return new CommandResult(Arrays.asList(failureMessage), false, false,
-                            roomImageAssetName, "Image");
+                            roomImageAssetName, "Image", false, false,
+                            true, true);
                 }
             } else {
                 String randomUseMessage = player.getName() + " used " + object + ".Nothing happened.";
                 String[] commandMessage = randomUseMessage.split("\\p{Punct}");
                 return new CommandResult(Arrays.asList(commandMessage), false, false,
-                        roomImageAssetName, "Image");
+                        roomImageAssetName, "Image", false, false,
+                        false, true);
 
             }
         }
@@ -458,6 +467,10 @@ public class GameEngine {
 
     public Map<String, Room> getRoomMap() {
         return roomsMap;
+    }
+
+    public void setRoomsMap(Map<String, Room> roomsMap) {
+        this.roomsMap = roomsMap;
     }
 
     public GameState getGameState() {

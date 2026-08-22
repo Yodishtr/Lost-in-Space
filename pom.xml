@@ -13,7 +13,7 @@
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mainClass>Main</mainClass>
+        <mainClass>UI.Main</mainClass>
     </properties>
 
     <dependencies>
@@ -78,8 +78,19 @@
                 <version>0.0.8</version>
             </plugin>
 
-            <!-- Bakes a Main-Class into the JAR's manifest so it's directly runnable
-                 and so jpackage can find your entry point later -->
+            <!-- JavaFX plugin configuration -->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <!-- Points directly to your Application subclass for `mvn javafx:run` -->
+                    <mainClass>UI.SpaceshipApp</mainClass>
+                </configuration>
+            </plugin>
+
+            <!-- Bakes a UI.Main-Class into the JAR's manifest so it's directly runnable
+                 and so jpackage can find the entry point later -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
